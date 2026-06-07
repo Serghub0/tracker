@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hotwire Circuit Tracker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/iconfont/tabler-icons.min.css">
+<style>
+:root{--bg:#1C2333;--bg2:#252E44;--bg3:#1E2840;--bg4:#1A2236;--brd:#2A3550;--brd2:#3A4560;--tx:#E8EAF0;--tx2:#C8D0E0;--tx3:#8A9BB5;--tx4:#607080;--blue:#185FA5;--blue2:#152440;--blue3:#4A7AB5;--green:#2D5A1B;--green2:#1A3A10;--green3:#5A9A38;--red:#7A2020;--red2:#3A1A1A;--red3:#D06060;--amb:#7A4A10;--amb2:#3A2A10;--amb3:#D08840;--pur:#2A1A5A;--pur3:#9090E0;--r:8px;--r2:12px;--r3:14px}
+.light{--bg:#F0F2F7;--bg2:#FFFFFF;--bg3:#F5F7FA;--bg4:#E8EBF2;--brd:#D0D5E0;--brd2:#B0B8CC;--tx:#1A2233;--tx2:#2A3550;--tx3:#5A6A85;--tx4:#8A9AB5;--blue:#1A5FA5;--blue2:#E6F1FB;--blue3:#3A7FD5;--green:#2A6010;--green2:#E8F5E0;--green3:#4A9A28;--red:#8A2020;--red2:#FBE8E8;--red3:#C04040;--amb:#7A4A08;--amb2:#FBF0E0;--amb3:#C07820;--pur:#2A1A8A;--pur3:#6060D0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,sans-serif;font-size:var(--base-font,13px);min-height:100vh}
+input,select,textarea,button{font-family:inherit;font-size:12px}
+button{cursor:pointer!important}
+a{color:var(--blue3);text-decoration:underline}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--brd2);border-radius:3px}
+.app{padding:.875rem 1.5rem 3.5rem;max-width:1400px;margin:0 auto}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:6px}
+.hdr-l{display:flex;align-items:center;gap:9px}
+.hico{width:34px;height:34px;border-radius:9px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#BFD8F5;font-size:17px;flex-shrink:0}
+.eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);font-weight:500}
+.htitle{font-size:16px;font-weight:600;color:var(--tx)}
+.hdr-r{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:var(--r);border:1px solid var(--brd2);background:var(--bg2);color:var(--tx2);font-size:11px;font-weight:500;cursor:pointer!important;white-space:nowrap;transition:opacity .12s}
+.btn:hover{opacity:.82}
+.btn-blue{background:var(--blue);color:#E6F1FB;border-color:var(--blue3)}
+.btn-green{background:var(--green);color:#C6E8B0;border-color:var(--green3)}
+.btn-red{color:var(--red3);border-color:rgba(180,60,60,.4);background:transparent}
+.btn-red:hover{background:var(--red2)}
+.btn-amb{background:var(--amb);color:#F5D080;border-color:var(--amb3)}
+.btn-pur{background:var(--pur);color:var(--pur3);border-color:var(--pur3)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--tx3)}
+.btn-ghost:hover{background:var(--bg3);color:var(--tx)}
+.btn-xs{padding:2px 6px;font-size:10px;border-radius:5px}
+.btn-sm{padding:4px 8px;font-size:11px}
+.btn-dis{opacity:.3;pointer-events:none}
+.ico-btn{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;border:1px solid transparent;background:transparent;color:var(--tx3);cursor:pointer!important;font-size:13px;flex-shrink:0}
+.ico-btn:hover{background:var(--bg3);color:var(--tx);border-color:var(--brd)}
+.nav{display:flex;gap:3px;margin-bottom:1rem;background:var(--bg4);padding:3px;border-radius:10px;width:fit-content;border:1px solid var(--brd);overflow-x:auto}
+.ntab{padding:5px 13px;border-radius:7px;font-size:11px;font-weight:500;color:var(--tx3);cursor:pointer!important;border:none;background:transparent;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.ntab.on{background:var(--bg2);color:var(--tx);border:1px solid var(--brd)}
+.nbadge{font-size:10px;background:var(--bg4);border:1px solid var(--brd);border-radius:20px;padding:1px 5px;color:var(--tx3)}
+.metrics{display:flex;gap:6px;margin-bottom:.75rem;flex-wrap:wrap}
+.mc{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:7px 12px;flex:1;min-width:120px;max-width:200px}
+.mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.mc-ico{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px}
+.mc-lbl{font-size:9px;color:var(--tx3);font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+.mc-val{font-size:18px;font-weight:700;color:var(--tx);line-height:1}
+.mc-sub{font-size:9px;color:var(--tx3);margin-top:1px}
+.alert{border-radius:var(--r);padding:8px 11px;display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:7px;border:1px solid}
+.a-risk{background:var(--amb2);border-color:var(--amb3);color:#F5C060}
+.a-sfp{background:var(--blue2);border-color:var(--blue3);color:#80B8E8}
+.a-cap{background:var(--red2);border-color:var(--red3);color:var(--red3)}
+.a-ico{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.d-blue{background:var(--blue3)}.d-red{background:var(--red3)}.d-amb{background:var(--amb3)}.d-green{background:var(--green3)}
+.spl{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:3px 8px;border-radius:20px}
+.sp-p{background:var(--blue2);color:#80B8E8}.sp-r{background:var(--red2);color:var(--red3)}.sp-o{background:var(--amb2);color:var(--amb3)}.sp-l{background:var(--green2);color:#80C060}.sp-d{background:var(--red2);color:var(--red3)}
+.tbadge{font-size:10px;font-weight:500;padding:2px 6px;border-radius:5px;background:var(--bg4);color:var(--tx3);border:1px solid var(--brd)}
+.prot-y{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--green2);color:#60C090;border:1px solid var(--green3)}
+.prot-n{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--bg4);color:var(--tx3);border:1px solid var(--brd)}
+.eng-chip{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--pur);color:var(--pur3);border:1px solid var(--pur3);display:inline-flex;align-items:center;gap:3px}
+.urg-btn{font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;border:1px solid;cursor:pointer!important;display:inline-flex;align-items:center;gap:3px}
+.urg-on{background:#4A0A0A;color:#FF6060;border-color:#8A2020}
+.urg-warn{background:#4A3500;color:#FFD060;border-color:#8A6000}
+.urg-off{background:var(--green2);color:#80C060;border-color:var(--green3)}
+.cbwrap{display:flex;align-items:center;justify-content:center;width:24px;flex-shrink:0;cursor:pointer!important}
+.chkbox{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--brd2);background:var(--bg3);display:flex;align-items:center;justify-content:center}
+.chkbox.on{background:var(--blue);border-color:var(--blue3)}
+.bulk-bar{background:var(--blue2);border:1px solid var(--blue3);border-radius:var(--r);padding:7px 12px;display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:11px;color:#80B8E8}
+.ccard{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r3);margin-bottom:7px;overflow:hidden;transition:border-color .15s}
+.ccard:hover{border-color:var(--brd2)}
+.ccard.open{border-color:var(--blue3)}
+.ccard.urg{border-left:3px solid var(--red3)}
+.ccard.sel-c{border-color:var(--blue3);background:var(--blue2)}
+.ccard.dg-top{border-top:3px solid var(--blue3)!important}
+.ccard.dg-bot{border-bottom:3px solid var(--blue3)!important}
+.ccard.dragging{opacity:.35}
+.ccard-top{padding:9px 13px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ccard-name{font-size:14px;font-weight:600;color:var(--tx);cursor:pointer!important;flex:1;min-width:100px}
+.ccard-tr{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-left:auto}
+.ccard-meta{padding:4px 13px 9px 44px;display:flex;align-items:center;gap:5px;cursor:pointer!important;flex-wrap:wrap}
+.cid-chip{font-size:10px;font-family:monospace;color:var(--tx3);background:var(--bg4);border:1px solid var(--brd);border-radius:4px;padding:1px 5px}
+.ccard-ep{font-size:11px;color:var(--tx3)}
+.cad-chip{display:flex;flex-direction:column;align-items:flex-end;margin-left:auto;flex-shrink:0}
+.cad-l{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:var(--tx3);font-weight:500}
+.cad-v{font-size:11px;font-weight:600;color:var(--tx)}
+.ccard-body{border-top:1px solid var(--brd);padding:13px}
+.gdiv{display:flex;align-items:center;gap:6px;padding:9px 13px;margin:4px 0;background:var(--blue2);border:1px solid var(--blue3);border-radius:var(--r3);cursor:grab}
+.gdiv.dragging{opacity:.35}
+.gdiv.dg-top{border-top:3px solid var(--amb3)!important}
+.gdiv.dg-bot{border-bottom:3px solid var(--amb3)!important}
+.gdiv-inp{font-size:14px;font-weight:600;color:var(--blue3);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1;min-width:60px;cursor:text}
+.gdiv-inp:focus{color:var(--tx);border-bottom-color:var(--blue3)}
+.pipeline{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.pl-track{position:relative;height:32px;border-radius:16px;background:var(--bg4);border:1px solid var(--brd);overflow:hidden;cursor:pointer!important}
+.pl-fill{height:100%;border-radius:16px;transition:width .4s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;min-width:32px}
+.pl-fill-done{background:linear-gradient(90deg,var(--green2),var(--green3))}
+.pl-fill-act{background:linear-gradient(90deg,var(--blue2),var(--blue3))}
+.pl-fill-skip{background:linear-gradient(90deg,var(--amb2),var(--amb3))}
+.pl-fill-pend{background:transparent;color:var(--tx4)}
+.pl-markers{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
+.pl-mark{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.15)}
+.pl-mark-lbl{position:absolute;top:50%;transform:translateY(-50%);font-size:9px;color:rgba(255,255,255,.45);pointer-events:none}
+.pl-phase-lbl{font-size:9px;color:var(--tx3);font-weight:500;display:flex;align-items:center;gap:4px;padding:0 2px}
+.pl-phase-lbl.pl-done{color:var(--green3)}
+.pl-phase-lbl.pl-act{color:var(--blue3);font-weight:600}
+.pl-phase-lbl.pl-skip{color:var(--amb3)}
+.pl-row{display:flex;align-items:center;gap:8px}
+.pl-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;border:1.5px solid;flex-shrink:0}
+.pl-done-ico{border-color:var(--green3);background:var(--green2);color:#C6E8B0}
+.pl-act-ico{border-color:var(--blue3);background:var(--blue2);color:#80B8E8}
+.pl-skip-ico{border-color:var(--amb3);background:var(--amb2);color:var(--amb3)}
+.pl-pend-ico{border-color:var(--brd2);background:var(--bg4);color:var(--tx4)}
+.dtabs{display:flex;gap:2px;background:var(--bg4);border-radius:var(--r);padding:2px;margin-bottom:11px;overflow-x:auto;border:1px solid var(--brd)}
+.dtab{flex:1;min-width:fit-content;padding:4px 7px;border-radius:5px;font-size:10px;font-weight:500;text-align:center;cursor:pointer!important;color:var(--tx3);white-space:nowrap;border:none;background:transparent}
+.dtab.on{background:var(--bg2);color:var(--tx);border:1px solid var(--brd)}
+.dtab.dt-done{color:var(--green3)}.dtab.dt-skip{color:var(--amb3);font-style:italic}
+.itabs{display:flex;gap:2px;background:var(--bg4);border-radius:6px;padding:2px;margin-bottom:9px;border:1px solid var(--brd)}
+.itab{flex:1;min-width:fit-content;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:500;text-align:center;cursor:pointer!important;color:var(--tx3);white-space:nowrap;border:none;background:transparent}
+.itab.on{background:var(--bg2);color:var(--tx);border:1px solid var(--brd)}
+.two-col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:11px}
+.panel{background:var(--bg3);border:1px solid var(--brd);border-radius:var(--r);padding:11px}
+.ptitle{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:9px;display:flex;align-items:center;justify-content:space-between;gap:5px}
+.ptitle-inp{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1}
+.ptitle-inp:focus{border-bottom-color:var(--blue3);color:var(--tx)}
+.cl{display:flex;flex-direction:column;gap:6px}
+.ci{display:flex;align-items:flex-start;gap:6px;padding:2px 0}
+.ci.dg-ci{border-top:2px solid var(--blue3)}
+.ci-chk{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--brd2);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;cursor:pointer!important}
+.ci-chk.on{background:var(--green2);border-color:var(--green3);color:#C6E8B0}
+.ci-r{flex:1;min-width:0}
+.ci-lw{display:flex;align-items:center;gap:4px}
+.ci-li{font-size:12px;color:var(--tx2);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1;min-width:60px;line-height:1.4}
+.ci-li:focus{border-bottom-color:var(--blue3);color:var(--tx)}
+.ci-li.struck{color:var(--tx4);text-decoration:line-through}
+.ci-date{font-size:10px;color:var(--green3);font-weight:500;margin-top:1px}
+.ecd-row{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap}
+.ecd-d{font-size:11px;border:1px solid var(--brd);border-radius:5px;padding:2px 6px;background:var(--bg2);color:var(--tx2);width:130px}
+.ecd-c{font-size:11px;border:1px solid var(--brd);border-radius:5px;padding:2px 6px;background:var(--bg2);color:var(--tx2);flex:1;min-width:100px}
+.ecd-d:focus,.ecd-c:focus{outline:none;border-color:var(--blue3)}
+.ci-note{font-size:11px;border:1px solid var(--brd);border-radius:4px;padding:2px 6px;background:var(--bg2);color:var(--tx2);width:100%;margin-top:3px}
+.ci-note:focus{outline:none;border-color:var(--blue3)}
+.note-links{margin-top:2px;display:flex;flex-direction:column;gap:2px}
+.nlink{font-size:11px;display:flex;align-items:center;gap:3px}
+.add-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--tx4);cursor:pointer!important;padding:3px 0;border:none;background:transparent;margin-top:3px}
+.add-btn:hover{color:var(--tx)}
+.fg{display:flex;flex-direction:column;gap:3px;margin-bottom:7px}
+.fl{display:flex;align-items:center;gap:3px}
+.fl-i{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1}
+.fl-i:focus{border-bottom-color:var(--blue3)}
+.fi{border:1px solid var(--brd);border-radius:6px;padding:5px 8px;font-size:11px;background:var(--bg2);color:var(--tx2);width:100%}
+.fi:focus{outline:none;border-color:var(--blue3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:3px}
+.cb-box{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r);padding:8px}
+.cb-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);font-weight:600;margin-bottom:4px}
+.ci2{width:100%;font-size:11px;border:1px solid var(--brd);border-radius:4px;padding:3px 5px;background:var(--bg3);color:var(--tx2);margin-bottom:3px}
+.ci2:last-child{margin-bottom:0}
+.ci2:focus{outline:none;border-color:var(--blue3)}
+.na{width:100%;border:1px solid var(--brd);border-radius:6px;padding:6px 8px;font-size:11px;background:var(--bg2);color:var(--tx2);resize:vertical;min-height:50px}
+.na:focus{outline:none;border-color:var(--blue3)}
+.ph-foot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;padding-top:11px;border-top:1px solid var(--brd);flex-wrap:wrap;gap:6px}
+.ph-prog{font-size:11px;color:var(--tx3)}
+.ph-prog strong{color:var(--tx)}
+.skip-note{background:var(--amb2);border:1px solid var(--amb3);border-radius:var(--r);padding:6px 9px;font-size:11px;color:var(--amb3);display:flex;align-items:center;gap:6px}
+.hist-list{display:flex;flex-direction:column;gap:5px;max-height:280px;overflow-y:auto}
+.hist-item{display:flex;gap:8px;font-size:11px;padding:5px 7px;background:var(--bg2);border-radius:5px;border:1px solid var(--brd)}
+.hist-ts{color:var(--tx4);white-space:nowrap;flex-shrink:0;font-size:10px;min-width:110px}
+.mov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);display:flex;align-items:flex-start;justify-content:center;z-index:1000;padding:1.5rem 1rem;overflow-y:auto}
+.modal{background:var(--bg2);border-radius:var(--r3);border:1px solid var(--brd2);padding:1.25rem;width:600px;max-width:100%;margin:auto}
+.modal-title{font-size:14px;font-weight:600;margin-bottom:3px;color:var(--tx)}
+.modal-sub{font-size:11px;color:var(--tx3);margin-bottom:.875rem;line-height:1.5}
+.modal-foot{display:flex;justify-content:flex-end;gap:6px;margin-top:.875rem;padding-top:.875rem;border-top:1px solid var(--brd)}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.full{grid-column:1/-1}
+.flbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);display:block;margin-bottom:3px}
+.finp{border:1px solid var(--brd2);border-radius:6px;padding:6px 9px;font-size:12px;background:var(--bg3);color:var(--tx2);width:100%}
+.finp:focus{outline:none;border-color:var(--blue3);background:var(--bg2)}
+.fnminp{border:1px solid var(--brd2);border-radius:7px;padding:8px 10px;font-size:13px;font-weight:500;background:var(--bg3);color:var(--tx);width:100%}
+.fnminp:focus{outline:none;border-color:var(--blue3);background:var(--bg2)}
+.conf-items{display:flex;flex-direction:column;gap:6px;margin:.75rem 0}
+.conf-row{display:flex;align-items:center;gap:8px;cursor:pointer!important;padding:7px 10px;border-radius:var(--r);border:1px solid var(--brd);background:var(--bg3)}
+.conf-row.on{background:var(--green2);border-color:var(--green3)}
+.conf-box{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--brd2);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.conf-row.on .conf-box{background:var(--green2);border-color:var(--green3);color:#C6E8B0}
+.conf-text{font-size:12px;color:var(--tx2)}
+.exp-list{display:flex;flex-direction:column;gap:5px;max-height:240px;overflow-y:auto;margin:.75rem 0}
+.exp-row{display:flex;align-items:center;gap:8px;padding:6px 9px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--brd);cursor:pointer!important}
+.exp-row.on{background:var(--blue2);border-color:var(--blue3)}
+.exp-chk{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--brd2);background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.exp-row.on .exp-chk{background:var(--blue);border-color:var(--blue3);color:#E6F1FB}
+.toolbar{display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
+.sinp{flex:1;min-width:160px;border:1px solid var(--brd);border-radius:var(--r);padding:6px 10px;font-size:12px;background:var(--bg3);color:var(--tx2)}
+.sinp:focus{outline:none;border-color:var(--blue3)}
+.ssel{font-size:11px;border:1px solid var(--brd);border-radius:var(--r);padding:5px 8px;background:var(--bg3);color:var(--tx2);cursor:pointer}
+.acard{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--r2);margin-bottom:7px;overflow:hidden}
+.acard.urg{border-left:3px solid var(--red3)}
+.acard-top{padding:9px 13px 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer!important;flex-wrap:wrap;gap:5px}
+.acard-name{font-size:14px;font-weight:600;color:var(--tx)}
+.acard-meta{padding:4px 13px 9px;display:flex;align-items:center;gap:5px;cursor:pointer!important;flex-wrap:wrap}
+.acard-det{border-top:1px solid var(--brd);padding:13px}
+.act-row{display:flex;gap:5px;flex-wrap:wrap;padding:7px 13px;border-top:1px solid var(--brd);background:var(--bg3)}
+.grp-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);padding:5px 0 3px;border-bottom:1px solid var(--brd);margin-bottom:5px;margin-top:8px;display:flex;align-items:center;gap:5px}
+.empty{text-align:center;padding:2rem 1rem;color:var(--tx4)}
+.empty-icon{font-size:30px;display:block;margin-bottom:8px}
+.smsg{font-size:11px;color:#80B8E8;padding:6px 10px;background:var(--blue2);border:1px solid var(--blue3);border-radius:var(--r);margin-bottom:7px}
+.save-banner{background:var(--green2);border:1px solid var(--green3);border-radius:var(--r);padding:7px 11px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:11px;color:#80C060}
+.sw{display:flex;gap:14px;align-items:flex-start}
+.snav{width:165px;flex-shrink:0;display:flex;flex-direction:column;gap:3px}
+.stab{padding:7px 10px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--tx3);cursor:pointer!important;border:none;background:transparent;text-align:left;display:flex;align-items:center;gap:6px}
+.stab.on{background:var(--bg3);color:var(--tx);border:1px solid var(--brd)}
+.sbody{flex:1;min-width:0}
+.ssec{background:var(--bg3);border:1px solid var(--brd);border-radius:var(--r2);padding:14px;margin-bottom:12px}
+.stitle{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:6px}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--brd);gap:10px}
+.srow:last-child{border-bottom:none}
+.slbl{font-size:12px;color:var(--tx2)}
+.ssub{font-size:10px;color:var(--tx3);margin-top:1px}
+.sinp2{border:1px solid var(--brd);border-radius:6px;padding:5px 8px;font-size:12px;background:var(--bg2);color:var(--tx2);width:200px}
+.sinp2:focus{outline:none;border-color:var(--blue3)}
+.ssel2{border:1px solid var(--brd);border-radius:6px;padding:5px 8px;font-size:12px;background:var(--bg2);color:var(--tx2)}
+.stog{width:38px;height:20px;border-radius:10px;border:none;cursor:pointer!important;position:relative;transition:background .2s;flex-shrink:0}
+.stog.on{background:var(--blue3)}.stog.off{background:var(--brd2)}
+.stog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;transition:left .2s}
+.stog.on::after{left:21px}.stog.off::after{left:3px}
+.tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:20px;background:var(--bg2);border:1px solid var(--brd);color:var(--tx2)}
+.tag-add{display:flex;gap:5px;margin-top:7px}
+.tag-inp{border:1px solid var(--brd);border-radius:6px;padding:4px 8px;font-size:11px;background:var(--bg2);color:var(--tx2);flex:1}
+.tag-inp:focus{outline:none;border-color:var(--blue3)}
+@media print{.hdr-r,.nav,.toolbar,.act-row,.btn,.ico-btn,.ci-note,.add-btn,.ph-foot,.bulk-bar,.gdiv,.sw{display:none!important}.ccard,.acard{page-break-inside:avoid}.ccard-body{display:block!important}.two-col{display:block!important}.panel{margin-bottom:8px}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+<div style="position:fixed;bottom:0;left:0;right:0;background:var(--bg4);border-top:1px solid var(--brd);padding:5px 16px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--tx4);z-index:50;user-select:none;pointer-events:none">
+  <span>Hotwire Circuit Delivery Tracker &mdash; Designed &amp; built by <strong style="color:var(--tx3)">Serginio Picard</strong> &copy; 2025&ndash;2026. All rights reserved.</span>
+  <span>Proprietary software. Unauthorized use or distribution is prohibited.</span>
+</div>
+<div id="mroot"></div>
+<script>
+const SK='hwct9',AK='hwct9a',DK='hwct9d',PK='hwct9p',TK='hwct9t',LK='hwct9l',QK='hwct9q',CK='hwct9c',GLK='hwct9g',SBK='hwct9sb';
+const fl=k=>{try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}};
+const fo=k=>{try{return JSON.parse(localStorage.getItem(k)||'{}')}catch{return{}}};
+const sv=(k,d)=>{try{localStorage.setItem(k,JSON.stringify(d))}catch{}};
+const DC_DEF=['Equinix','Coresite','QTS','Databank','Lightedge','H5 / 365TPA','Tierpoint','Cypress HQ','Salisbury MLK'];
+const SVC_DEF=['Lit Service','ELAN','EPL','EPLS','DIA','Dark fiber','Ethernet'];
+const CAR_DEF=['Lumen','AT&T','Zayo','Uniti','Crown Castle','Windstream','Comcast Business'];
+const CAP_DEF=['1G','10G','100G','400G','1T','2x strand','4x strand'];
+const ALL_PH=[{key:'order',label:'Order & commercial',short:'Order'},{key:'osp',label:'OSP / outside plant',short:'OSP'},{key:'cab_site',label:'Cab / site readiness',short:'Cab/Site'},{key:'rack',label:'Rack & stack',short:'Rack & stack'},{key:'carrier_ttu',label:'Carrier TTU',short:'Carrier TTU'},{key:'loa_xc',label:'LOA & cross connect',short:'LOA / XC'},{key:'hwc_ttu',label:'HWC TTU',short:'HWC TTU'}];
+const ECD_PH=new Set(['osp','cab_site','rack','carrier_ttu','loa_xc','hwc_ttu']);
+const DARK_MOP=new Set(['carrier_ttu','hwc_ttu']);
+const CONF_ITEMS=['L1 optical test passed','Carrier turn-up confirmed','Completion notice PDF received','SiteTracker updated','NCS Record updated','Hotwire Ticket Closed','Final notes added'];
+let circuits=fl(SK),archive=fl(AK),deleted=fl(DK),queue=fl(QK),completed=fl(CK),glog=fl(GLK);
+let prefs=fo(PK);
+let tmpl=fo(TK);
+function defTmpl(){return{cl:{order:['Hotwire and Carrier Ticket','Carrier order number confirmed','Circuit ID assigned','Service type & capacity confirmed','CAD set','Protection type confirmed'],osp:['Fiber tail route confirmed','MMP / handhole / vault identified','Splicing scheduled','Splicing complete','OSP construction complete','OTDR PDF received (dark fiber)','OTDR pass/fail confirmed (dark fiber)'],cab_site:['ROW permit approved','Cabinet/enclosure installation scheduled','Cabinet/enclosure installed','Permanent power ordered','Generator ordered (if needed)','Generator on site','Permanent power delivered','Generator removed'],rack:['RU position confirmed','SFP type confirmed with Hotwire engineers','SFP ordered (~30d before ECD)','SFP delivered','SFP ready for smart hands'],carrier_ttu:['Carrier turn-up scheduled','Circuit turn-up confirmed by carrier','Carrier test results received'],loa_xc:['LOA received from carrier','LOA filed and logged','Router port assigned by Hotwire engineers','VLAN assigned','Cross connect order placed','Smart hands dispatched','Cross connect completed and confirmed','Hotwire Ticket Update'],hwc_ttu:['L1 optical verified (Hotwire)','Hotwire internal testing complete','Circuit accepted and signed off','Completion notice PDF received','SiteTracker updated','NCS Record updated','Hotwire Ticket Update','Hotwire Ticket Closed']},phLabels:{},fieldLabels:{},wordSettings:{companyName:'Hotwire Communications',showStatus:true,showPhase:true,showDates:true,showTeam:true,showTechnical:true,showContacts:true,showNotes:false,accentColor:'#1B3F6E'},displaySettings:{defaultSort:'cad',defaultGroup:'',capWarning:40},autoBackup:{onClose:false,daily:false,lastAutoBackup:null},dataSources:{serviceTypes:[...SVC_DEF],carriers:[...CAR_DEF],dataCenters:[...DC_DEF],capacities:[...CAP_DEF]},
+    alerts:[
+      {id:'risk',enabled:true,label:'At risk',description:'ECD is within N days of CAD',days:30,color:'#D08840',metric:true},
+      {id:'urgent',enabled:true,label:'Urgent',description:'Circuit manually flagged urgent',days:null,color:'#D06060',metric:true},
+      {id:'sfp',enabled:true,label:'SFP order needed',description:'SFP not ordered within N days of rack ECD',days:30,color:'#4A7AB5',metric:false},
+      {id:'cap',enabled:true,label:'Capacity warning',description:'In-flight circuit count reaches N',days:null,threshold:40,color:'#C04040',metric:false}
+    ],
+    reference:{
+      acronymsTitle:'Acronyms',
+      rulesTitle:'Rules & Guidelines',
+      linksTitle:'Key Websites & Tickets',
+      acronyms:[
+        {term:'CAD',def:'Circuit Activation Date — internal Hotwire hard deadline'},
+        {term:'ECD',def:'Estimated Completion Date — per-phase expected delivery date'},
+        {term:'TTU',def:'Turn-To-Up — carrier or Hotwire circuit activation milestone'},
+        {term:'OSP',def:'Outside Plant — fiber infrastructure outside the building'},
+        {term:'LOA',def:'Letter of Authorization — document authorizing cross connect'},
+        {term:'XC',def:'Cross Connect — physical cable connection at a data center'},
+        {term:'MMP',def:'Manhole / Maintenance Point — underground access point'},
+        {term:'OTDR',def:'Optical Time Domain Reflectometer — fiber testing tool'},
+        {term:'SFP',def:'Small Form-factor Pluggable — optical transceiver module'},
+        {term:'NRC',def:'Non-Recurring Charge — one-time installation fee'},
+        {term:'MRC',def:'Monthly Recurring Charge — ongoing monthly cost'},
+        {term:'POP',def:'Point of Presence — carrier network access location'},
+        {term:'EPLS',def:'Ethernet Private Line Service — dedicated Ethernet circuit'},
+        {term:'ELAN',def:'Ethernet LAN — multi-point Ethernet service'},
+        {term:'EPL',def:'Ethernet Private Line — point-to-point Ethernet service'},
+        {term:'DIA',def:'Dedicated Internet Access — dedicated internet circuit'},
+        {term:'ROW',def:'Right of Way — legal permission to install infrastructure'}
+      ],
+      rules:[
+        {title:'Always verify CAD before committing ECD',body:'The CAD is the hard internal deadline. Set ECDs with enough buffer to allow for delays. Flag At Risk immediately if ECD falls within 30 days of CAD.'},
+        {title:'SFP orders must be placed 30 days before ECD',body:'SFP transceivers have lead times. Order as soon as ECD for the rack phase is confirmed to avoid delays at turn-up.'},
+        {title:'LOA must be received before cross connect is ordered',body:'Do not order the cross connect until the LOA is received and filed. Missing this step causes data center delays.'},
+        {title:'OTDR test required for all dark fiber circuits',body:'All dark fiber circuits require an OTDR PDF before Hotwire TTU. This must be received and logged before proceeding.'},
+        {title:'Update SiteTracker and NCS Record before closing ticket',body:'Both systems must be updated before the Hotwire ticket can be closed. This is required for HWC TTU completion.'},
+        {title:'Backup tracker weekly',body:'All data is stored in browser local storage. A weekly backup protects against data loss from browser updates or hardware changes.'}
+      ],
+      links:[
+        {label:'SiteTracker',url:'https://hotwire.sitetracker.com',desc:'Project and circuit management system'},
+        {label:'Internal Ticketing',url:'https://tickets.hotwire.com',desc:'Hotwire internal support tickets'},
+        {label:'Carrier Portal — Lumen',url:'https://lumen.com/portal',desc:'Lumen circuit orders and status'},
+        {label:'Carrier Portal — Zayo',url:'https://zayo.com/portal',desc:'Zayo circuit orders and status'}
+      ]
+    }};}
+if(!tmpl.cl)tmpl=defTmpl();
+if(!prefs.theme)prefs.theme='dark';
+let iList=fl(LK);
+deleted=deleted.filter(c=>new Date(c.deletedAt||0).getTime()>Date.now()-30*864e5);sv(DK,deleted);
+let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
+let dgSrc=null,ciDg=null;
+
+function mkItem(label,isEcd){return{label,done:false,date:'',note:'',links:[],isEcd:!!isEcd,ecdDate:'',ecdCond:''};}
+function mkPhase(key,isDark){
+  const cl=tmpl.cl[key]||[];const items=[];
+  if(ECD_PH.has(key))items.push(mkItem('ECD',true));
+  cl.forEach(l=>{if(!l.includes('dark fiber')||isDark)items.push(mkItem(l));});
+  if(isDark&&DARK_MOP.has(key))items.push(mkItem('MOP date and time'));
+  return{key,label:tmpl.phLabels[key]||ALL_PH.find(p=>p.key===key)?.label||key,done:false,date:'',skipped:isDark&&key==='loa_xc',notes:'',links:[],items};
+}
+function mkCircuit(d){
+  const isDark=(d.serviceType||'').toLowerCase().includes('dark');
+  const phases=ALL_PH.map(p=>mkPhase(p.key,isDark));
+  const now=new Date().toISOString();
+  return{id:'hw-'+Date.now()+'-'+Math.random().toString(36).slice(2,6),createdAt:now,name:d.name||'',transportEngineer:d.transportEngineer||'',circuitId:d.circuitId||'',serviceType:d.serviceType||'',carrier:d.carrier||'',capacity:d.capacity||'',protection:d.protection||'Unprotected',nrc:'',cad:d.cad||'',aEnd:d.aEnd||'',zEnd:d.zEnd||'',isDark,urgent:false,priority:0,currentPhase:0,phases,orderNum:'',sfpType:'',sfpOrdered:'',sfpDelivered:'',coloLocation:'',routerPort:'',vlan:'',ospMmp:'',ospSplice:'',ospFiber:'',otdrResult:'',otdrDate:'',genDelivered:'',utilityEta:'',loaDate:'',xcOrderNum:'',xcConfirmed:'',l1Result:'',l1Date:'',completionDate:'',turnupDate:'',sitetrackerUpdated:'',hwSignoff:'',mopCarrier:'',mopHwc:'',carrierPmName:'',carrierPmPhone:'',carrierPmEmail:'',hwPmName:'',hwPmPhone:'',hwPmEmail:'',hwEngName:'',history:[{ts:now,msg:'Circuit created'}]};
+}
+function addH(c,msg){if(!c.history)c.history=[];c.history.push({ts:new Date().toISOString(),msg});gLog('circuit','['+dn(c)+'] '+msg);}
+function gLog(category,msg){glog.unshift({ts:new Date().toISOString(),cat:category,msg});if(glog.length>500)glog=glog.slice(0,500);sv(GLK,glog);}
+function dU(s){if(!s)return null;return Math.ceil((new Date(s+'T00:00:00')-new Date())/864e5);}
+function fD(s){if(!s)return'--';try{return new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}catch{return s};}
+function fTs(s){if(!s)return'';try{const d=new Date(s);return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}catch{return s};}
+function dn(c){return c.name||c.circuitId||c.id;}
+function getAlertCfg(id){return(tmpl.alerts||[]).find(a=>a.id===id);}
+function isAlertOn(id){const a=getAlertCfg(id);return a?a.enabled!==false:true;}
+function getSt(c){
+  const riskCfg=getAlertCfg('risk');
+  const riskDays=(riskCfg&&riskCfg.days!=null)?riskCfg.days:30;
+  const riskOn=riskCfg?riskCfg.enabled!==false:true;
+  const e=c.phases[c.currentPhase]?.items?.find(i=>i.isEcd);
+  const ed=e?.ecdDate?dU(e.ecdDate):null;
+  const cd=dU(c.cad);
+  if(riskOn&&ed!==null&&cd!==null&&ed<=riskDays)return'risk';
+  if(c.currentPhase===0&&!c.phases[0].done)return'order';
+  return'prog';
+}
+function sfpA(c){
+  const sfpCfg=getAlertCfg('sfp');
+  if(sfpCfg&&sfpCfg.enabled===false)return false;
+  const sfpDays=(sfpCfg&&sfpCfg.days!=null)?sfpCfg.days:30;
+  const r=c.phases.find(p=>p.key==='rack');if(!r)return false;
+  const s=r.items.find(i=>i.label.includes('SFP ordered'));if(!s||s.done)return false;
+  const e=r.items.find(i=>i.isEcd);return e?.ecdDate&&dU(e.ecdDate)<=sfpDays;
+}
+function visPh(c){return ALL_PH.map((p,i)=>({...p,idx:i,ph:c.phases[i]})).filter(p=>!(c.isDark&&p.key==='loa_xc'));}
+function isUrl(s){try{new URL(s);return true}catch{return false};}
+function getNext(c){const ph=c.phases[c.currentPhase];if(!ph)return'--';const n=ph.items.find(i=>!i.done);return n?n.label:'All items complete';}
+function getLast(c){let l='--';c.phases.forEach((p,i)=>{if(p.done)l=ALL_PH[i]?.label||l;});const ph=c.phases[c.currentPhase];if(ph){const d=ph.items.filter(i=>i.done);if(d.length)l=d[d.length-1].label;}return l;}
+function getStore(src){return src==='archive'?archive:src==='deleted'?deleted:src==='completed'?completed:src==='queue'?queue:circuits;}
+function setStore(src,data){if(src==='archive'){archive=data;sv(AK,archive);}else if(src==='deleted'){deleted=data;sv(DK,deleted);}else if(src==='completed'){completed=data;sv(CK,completed);}else if(src==='queue'){queue=data;sv(QK,queue);}else{circuits=data;sv(SK,circuits);syncIL();}}
+function syncIL(){const ex=new Set(iList.filter(x=>x.type==='circuit').map(x=>x.id));circuits.forEach(c=>{if(!ex.has(c.id)){iList.push({type:'circuit',id:c.id});ex.add(c.id);}});iList=iList.filter(x=>x.type==='group'||circuits.find(c=>c.id===x.id));sv(LK,iList);}
+function showMsg(m){ui.msg=m;renderApp();setTimeout(()=>{ui.msg='';renderApp();},4000);}
+function dcOpts(id){return'<datalist id="'+id+'">'+(tmpl.dataSources?.dataCenters||DC_DEF).map(o=>'<option value="'+o+'">').join('')+'</datalist>';}
+
+function render(){document.documentElement.className=prefs.theme==='light'?'light':'';renderApp();renderModal();}
+
+function renderApp(){
+  const app=document.getElementById('app');if(!app)return;
+  const risky=isAlertOn('risk')?circuits.filter(c=>getSt(c)==='risk'):[];
+  const sfps=circuits.filter(c=>sfpA(c));
+  const capCfg=getAlertCfg('cap');
+  const capW=(capCfg&&capCfg.threshold!=null)?capCfg.threshold:(tmpl.displaySettings?.capWarning||40);
+  const capOn=capCfg?capCfg.enabled!==false:true;
+  const co=tmpl.wordSettings?.companyName||'Hotwire Communications';
+  let h='<div class="hdr"><div class="hdr-l"><div class="hico"><i class="ti ti-topology-ring-3"></i></div><div><div class="eyebrow">'+co+'</div><div class="htitle">'+(tmpl.displaySettings&&tmpl.displaySettings.trackerName?tmpl.displaySettings.trackerName:'Circuit Delivery Tracker')+'</div></div></div>';
+  h+='<div class="hdr-r">';
+  h+='<button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light" style="font-size:16px;padding:3px 7px">'+(prefs.theme==='dark'?'&#9728;&#65039;':'&#127769;')+'</button>';
+  h+='<button class="btn btn-pur btn-sm" onclick="openExp(ui.tab)"><i class="ti ti-file-export"></i> Export</button>';
+  h+='<button class="btn btn-amb btn-sm" onclick="openBk()"><i class="ti ti-database-export"></i> Backup</button>';
+      h+='<button class="btn btn-sm" onclick="openSBk()" title="Backup settings only"><i class="ti ti-settings-2"></i> Backup settings</button>';
+  h+='<button class="btn btn-sm" onclick="openRst()"><i class="ti ti-database-import"></i> Restore</button>';
+      h+='<button class="btn btn-sm" onclick="setTab(\'settings\')"><i class="ti ti-settings"></i> Settings</button>';
+  
+  h+='<button class="btn btn-blue btn-sm" onclick="openNew()"><i class="ti ti-plus"></i> New circuit</button>';
+  h+='</div></div>';
+  if(ui.msg)h+='<div class="smsg"><i class="ti ti-check"></i> '+ui.msg+'</div>';
+  if(ui.pendTmpl)h+='<div class="save-banner"><span><i class="ti ti-template"></i> Template changes detected</span><div style="display:flex;gap:5px"><button class="btn btn-sm btn-ghost" onclick="discardTmpl()">Discard</button><button class="btn btn-sm btn-green" onclick="saveTmpl()"><i class="ti ti-device-floppy"></i> Save as default</button></div></div>';
+  h+='<div class="nav">';
+  h+='<button class="ntab '+(ui.tab==='inflight'?'on':'')+'" onclick="setTab(\'inflight\')"><i class="ti ti-antenna" style="font-size:11px"></i> In flight <span class="nbadge">'+circuits.length+'</span></button>';
+
+  h+='<button class="ntab '+(ui.tab==='queue'?'on':'')+'" onclick="setTab(\'queue\')"><i class="ti ti-clock-pause" style="font-size:11px"></i> In queue <span class="nbadge">'+queue.length+'</span></button>';
+  h+='<button class="ntab '+(ui.tab==='archive'?'on':'')+'" onclick="setTab(\'archive\')"><i class="ti ti-archive" style="font-size:11px"></i> Archive <span class="nbadge">'+archive.length+'</span></button>';
+
+  h+='<button class="ntab '+(ui.tab==='completed'?'on':'')+'" onclick="setTab(\'completed\')"><i class="ti ti-circle-check" style="font-size:11px"></i> Completed <span class="nbadge">'+completed.length+'</span></button>';
+  h+='<button class="ntab '+(ui.tab==='deleted'?'on':'')+'" onclick="setTab(\'deleted\')"><i class="ti ti-trash" style="font-size:11px"></i> Deleted <span class="nbadge">'+deleted.length+'</span></button>';
+  
+  h+='</div>';
+  if(ui.tab==='queue'){h+=renderQueue();}
+  else if(ui.tab==='inflight'){
+    if(capOn&&circuits.length>=capW)h+='<div class="alert a-cap"><div class="a-ico" style="background:var(--red);color:#fff"><i class="ti ti-alert-triangle"></i></div>Capacity advisory: '+circuits.length+' in-flight circuits. Consider archiving.</div>';
+    if(archive.length>=capW)h+='<div class="alert a-cap"><div class="a-ico" style="background:var(--red);color:#fff"><i class="ti ti-archive"></i></div>Archive advisory: '+archive.length+' records. Export old data.</div>';
+    h+='<div class="metrics">';
+    const _allAlerts=tmpl.alerts||getDefaultAlerts();
+    const _urgCfg=_allAlerts.find(a=>a.id==='urgent')||{label:'Urgent',enabled:true,color:'#D06060',metric:true};
+    const _riskCfg=_allAlerts.find(a=>a.id==='risk')||{label:'At risk',enabled:true,color:'#D08840',metric:true};
+    if(_urgCfg.enabled!==false&&_urgCfg.metric!==false)h+='<div class="mc" style="cursor:pointer;border-left:3px solid '+_urgCfg.color+'" onclick="filterUrgent()" title="Click to filter"><div class="mc-top"><span class="mc-lbl">'+_urgCfg.label+'</span><div class="mc-ico" style="background:var(--red2);color:var(--red3)"><i class="ti ti-flame"></i></div></div><div class="mc-val">'+circuits.filter(c=>c.urgent||c.priority>0).length+'</div><div class="mc-sub" style="color:var(--blue3)">click to filter</div></div>';
+    if(_riskCfg.enabled!==false&&_riskCfg.metric!==false)h+='<div class="mc" style="cursor:pointer;border-left:3px solid '+_riskCfg.color+'" onclick="filterRisk()" title="Click to filter"><div class="mc-top"><span class="mc-lbl">'+_riskCfg.label+'</span><div class="mc-ico" style="background:var(--amb2);color:var(--amb3)"><i class="ti ti-alert-triangle"></i></div></div><div class="mc-val">'+risky.length+'</div><div class="mc-sub" style="color:var(--blue3)">click to filter</div></div>';
+    _allAlerts.filter(a=>a.metric&&a.id!=='urgent'&&a.id!=='risk'&&a.enabled!==false).forEach(al=>{h+='<div class="mc" style="border-left:3px solid '+(al.color||'#888')+'"><div class="mc-top"><span class="mc-lbl">'+al.label+'</span></div><div class="mc-val">--</div><div class="mc-sub">custom</div></div>';});
+    h+='</div>';
+    // Completed names box
+    if(completed.length>0){
+      let _cbox='<div style="background:var(--green2);border:1px solid var(--green3);border-radius:var(--r);padding:7px 11px;margin-bottom:8px;display:flex;align-items:flex-start;gap:8px">';
+      _cbox+='<div style="flex-shrink:0"><i class="ti ti-circle-check" style="color:var(--green3);font-size:14px"></i></div>';
+      _cbox+='<div style="flex:1"><div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--green3);margin-bottom:4px">Recently completed ('+completed.length+')</div>';
+      _cbox+='<div style="display:flex;flex-wrap:wrap;gap:5px">';
+      completed.slice(0,8).forEach(c=>{
+        _cbox+='<span style="font-size:11px;background:var(--green2);border:1px solid var(--green3);border-radius:5px;padding:2px 8px;color:var(--blue3);cursor:pointer;font-weight:600" onclick="setTab(\'completed\')">'+(dn(c))+'</span>';
+      });
+      if(completed.length>8)_cbox+='<span style="font-size:11px;color:var(--green3);padding:2px 4px">+'+( completed.length-8)+' more</span>';
+      _cbox+='</div></div>';
+      _cbox+='<button class="btn btn-xs btn-ghost" onclick="setTab(\'completed\')" style="flex-shrink:0;font-size:10px">View all</button>';
+      _cbox+='</div>';
+      h+=_cbox;
+    }
+    
+    
+    h+=renderIF();
+  } else if(ui.tab==='archive'){h+=renderArch();}
+  else if(ui.tab==='completed'){h+=renderCompleted();}
+  else if(ui.tab==='deleted'){h+=renderDel();}
+  else if(ui.tab==='settings'){h+=renderSettings();}
+  app.innerHTML=h;
+}
+
+function renderIF(){
+  syncIL();
+  let all=[...circuits];
+  const q=(ui.ifSrch||'').toLowerCase();
+  if(ui.ifSort==='cad')all.sort((a,b)=>(a.cad||'9999')>(b.cad||'9999')?1:-1);
+  else if(ui.ifSort==='engineer')all.sort((a,b)=>(a.transportEngineer||'').localeCompare(b.transportEngineer||''));
+  else if(ui.ifSort==='service')all.sort((a,b)=>(a.serviceType||'').localeCompare(b.serviceType||''));
+  else if(ui.ifSort==='site')all.sort((a,b)=>(a.zEnd||'').localeCompare(b.zEnd||''));
+  else if(ui.ifSort==='urgent')all.sort((a,b)=>(b.urgent?1:0)-(a.urgent?1:0));
+  const _filter=ui.ifFilter||'';
+  const fids=new Set(all.filter(c=>{
+    if(_filter==='risk') return getSt(c)==='risk';
+    if(_filter==='urgent') return c.urgent||c.priority>0;
+    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q));
+  }).map(c=>c.id));
+  const selCount=ui.selCards.size;
+  let h='<div class="toolbar">';
+  h+='<input class="sinp" placeholder="Search circuits..." value="'+(ui.ifSrch||'').replace(/"/g,'&quot;')+'" oninput="setIFS(this.value)" style="max-width:220px">';
+  if(ui.ifFilter)h+='<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:20px;background:var(--amb2);color:var(--amb3);border:1px solid var(--amb3)"><i class="ti ti-filter"></i> '+(ui.ifFilter==='risk'?'At risk':'Urgent / Warning')+' <button onclick="clearFilter()" style="border:none;background:transparent;color:var(--amb3);cursor:pointer;font-size:12px;line-height:1;padding:0 0 0 3px">&times;</button></span>';
+  h+='<select class="ssel" onchange="setIFSort(this.value)"><option value="cad" '+(ui.ifSort==='cad'?'selected':'')+'>Sort: CAD</option><option value="engineer" '+(ui.ifSort==='engineer'?'selected':'')+'>Sort: Engineer</option><option value="service" '+(ui.ifSort==='service'?'selected':'')+'>Sort: Service</option><option value="site" '+(ui.ifSort==='site'?'selected':'')+'>Sort: Site</option><option value="urgent" '+(ui.ifSort==='urgent'?'selected':'')+'>Sort: Urgent first</option></select>';
+  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option></select>';
+  if(selCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected ('+selCount+')</button>';
+  const divSelCount=[...ui.selCards].filter(id=>id.startsWith('div-')).length;
+  if(divSelCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDelDivs()" title="Delete selected dividers"><i class="ti ti-trash"></i> Delete divider ('+divSelCount+')</button>';
+  h+='</div>';
+  if(selCount>0)h+='<div class="bulk-bar"><i class="ti ti-checkbox"></i><strong>'+selCount+'</strong> selected &nbsp;<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected</button><button class="btn btn-sm btn-ghost" onclick="clearSel()">Clear</button></div>';
+  if(!all.length)return h+'<div class="empty"><i class="ti ti-topology-star-3 empty-icon"></i>No circuits. Click <strong>New circuit</strong>.</div>';
+  if(ui.ifGroup){
+    const groups={};all.forEach(c=>{if(!fids.has(c.id))return;const k=ui.ifGroup==='engineer'?c.transportEngineer||'Unassigned':ui.ifGroup==='service'?c.serviceType||'Unknown':ui.ifGroup==='site'?c.zEnd||'Unknown site':c.urgent?'Urgent':'Normal';if(!groups[k])groups[k]=[];groups[k].push(c);});
+    // % grouping: bucket into 0-24, 25-49, 50-74, 75-99, 100
+    if(ui.ifGroup==='pct'){
+      const buckets={'0–24%':[],'25–49%':[],'50–74%':[],'75–99%':[],'100% Done':[]};
+      all.filter(c=>fids.has(c.id)).forEach(c=>{
+        const vph=visPh(c);const done=vph.filter(v=>v.ph.done).length;
+        const pct=vph.length>0?Math.round((done/vph.length)*100):0;
+        const bkt=pct===100?'100% Done':pct>=75?'75–99%':pct>=50?'50–74%':pct>=25?'25–49%':'0–24%';
+        buckets[bkt].push(c);
+      });
+      Object.entries(buckets).forEach(([g,list])=>{if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
+      return h;
+    }
+    Object.entries(groups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-folder"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});return h;
+  }
+  h+='<div id="if-list" ondragover="listDO(event)" ondrop="listDrop(event)">';
+  iList.forEach((item,idx)=>{
+    if(item.type==='group'){
+      const gdSel=ui.selCards.has('div-'+item.id);
+      h+='<div class="gdiv '+(gdSel?'sel-c':'')+'" id="gd-'+item.id+'" draggable="true" ondragstart="gdDS(event,\''+item.id+'\','+idx+')" ondragend="gdDE(event)" ondragover="gdDOv(event,\''+item.id+'\','+idx+')" ondrop="gdDrop(event,\''+item.id+'\','+idx+')">';
+      h+='<div class="cbwrap" onclick="togSelGD(\''+item.id+'\',event)" title="Select"><div class="chkbox '+(gdSel?'on':'')+'">'+(gdSel?'<i class="ti ti-check" style="font-size:9px;color:#E6F1FB"></i>':'')+'</div></div>';
+      h+='<i class="ti ti-grip-vertical" style="color:var(--blue3);font-size:14px;flex-shrink:0;cursor:grab"></i>';
+      h+='<i class="ti ti-separator" style="color:var(--blue3);font-size:15px;flex-shrink:0"></i>';
+      h+='<input class="gdiv-inp" value="'+(item.label||'').replace(/"/g,'&quot;')+'" placeholder="Divider label..." oninput="renameGD(\''+item.id+'\',this.value)" onclick="event.stopPropagation()">';
+
+      h+='</div>';
+    } else {
+      const c=circuits.find(x=>x.id===item.id);
+      if(c&&fids.has(c.id))h+=renderCard(c,true,idx);
+    }
+  });
+  h+='</div>';return h;
+}
+
+function renderCard(c,draggable,iIdx){
+  const st=getSt(c),isOpen=ui.multiOpen?ui.openCards.has(c.id):ui.sel===c.id,isSel=ui.selCards.has(c.id);
+  const pill=st==='risk'?'<span class="spl sp-r"><span class="dot d-red"></span>At risk</span>':st==='order'?'<span class="spl sp-o"><span class="dot d-amb"></span>On order</span>':'<span class="spl sp-p"><span class="dot d-blue"></span>In progress</span>';
+  const prot=c.protection==='Protected'?'<span class="prot-y">Protected</span>':'<span class="prot-n">Unprotected</span>';
+  const dragA=draggable?'draggable="true" ondragstart="cgDS(event,\''+c.id+'\','+iIdx+')" ondragend="cgDE(event)" ondragover="cgDO(event,\''+c.id+'\')" ondrop="cgDrop(event,\''+c.id+'\','+iIdx+')"':'';
+  let h='<div class="ccard '+(isOpen?'open ':'')+( c.urgent?'urg ':'')+( isSel?'sel-c ':'')+'" id="cc-'+c.id+'" '+dragA+'>';
+  h+='<div class="ccard-top">';
+  h+='<div class="cbwrap" onclick="togSel(\''+c.id+'\',event)" title="Select"><div class="chkbox '+(isSel?'on':'')+'">'+(isSel?'<i class="ti ti-check" style="font-size:9px;color:#E6F1FB"></i>':'')+'</div></div>';
+  if(draggable)h+='<i class="ti ti-grip-vertical" style="color:var(--tx4);font-size:14px;cursor:grab;flex-shrink:0" onclick="event.stopPropagation()"></i>';
+  const _nameBg=tmpl.displaySettings?.cardNameBg||'';
+  const _urgCol=tmpl.displaySettings?.urgentColor||'';
+  if(_urgCol&&c.urgent){h=h.replace('class="ccard urg','class="ccard urg" style="border-left-color:'+_urgCol+'"');}
+  h+='<span class="ccard-name" onclick="toggleCard(\''+c.id+'\')" style="'+(  _nameBg&&_nameBg!=='#252E44'?'background:'+_nameBg+';padding:1px 6px;border-radius:4px;':'')+'">'+dn(c)+'</span>';
+  h+='<div class="ccard-tr">';
+  const _p=c.priority||0;
+  const _pCls=_p===2?'urg-on':_p===1?'urg-warn':'urg-off';
+  const _pLbl=_p===2?'&#128308; Urgent':_p===1?'&#128993; Warning':'&#128994; Normal';
+  h+='<button class="urg-btn '+_pCls+'" onclick="togUrg(\''+c.id+'\')">'+_pLbl+'</button>';
+  if(sfpA(c))h+='<span style="font-size:10px;color:var(--amb3);font-weight:600"><i class="ti ti-package"></i> SFP!</span>';
+  h+=pill;
+  
+  h+='</div></div>';
+  h+='<div class="ccard-meta" onclick="toggleCard(\''+c.id+'\')">';
+  if(c.circuitId)h+='<span class="cid-chip">'+c.circuitId+'</span>';
+  h+='<span class="tbadge">'+(c.serviceType||'--')+'</span>'+prot;
+  h+='<span class="ccard-ep">'+(c.carrier||'--')+' &middot; '+(c.aEnd||'--')+' &rarr; '+(c.zEnd||'--')+'</span>';
+  if(c.transportEngineer)h+='<span class="eng-chip"><i class="ti ti-user-bolt" style="font-size:9px"></i><span style="font-size:9px;opacity:.75;margin-right:2px">'+(tmpl.displaySettings?.engLabel||'TE')+'</span>'+c.transportEngineer+'</span>';
+  // Progress % + pending phases always visible on card
+  const _vph=visPh(c);
+  const _done=_vph.filter(v=>v.ph.done).length;
+  const _pct=_vph.length>0?Math.round((_done/_vph.length)*100):0;
+  const _pctColor=_pct===100?'var(--green3)':_pct>=50?'var(--blue3)':_pct>0?'var(--amb3)':'var(--tx4)';
+  // Build pending phases list
+  const _pending=_vph.filter(v=>!v.ph.done&&!v.ph.skipped);
+  let _pendH='';
+  _pending.forEach(vp=>{
+    const _ecd=vp.ph.items.find(i=>i.isEcd);
+    const _ecdDate=_ecd&&_ecd.ecdDate?(_ecd.ecdDate.match(/^\d{4}-\d{2}-\d{2}$/)?fD(_ecd.ecdDate):_ecd.ecdDate):'';
+    const _ecdCond=_ecd&&_ecd.ecdCond?_ecd.ecdCond:'';
+    const _ecdVal=_ecdDate&&_ecdCond?_ecdDate+' · '+_ecdCond:_ecdDate||_ecdCond||'None';
+    _pendH+='<div style="line-height:1.5;text-align:center;padding:1px 0">'
+      +'<span style="font-size:11px;font-weight:600;color:var(--tx2)">'+vp.short+'</span> '
+      +'<span style="font-size:10px;color:'+(_ecdDate?'var(--amb3)':_ecdCond?'var(--blue3)':'var(--tx4)')+'">'+_ecdVal+'</span>'
+      +'</div>';
+  });
+  h+='<div style="display:flex;align-items:flex-start;gap:8px;flex-shrink:0;margin-left:auto">';
+  // Pending phases column — LEFT of percentage
+
+  // % + mini bar + phases fraction — RIGHT
+  h+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:58px">';
+  h+='<div style="font-size:16px;font-weight:700;color:'+_pctColor+'">'+_pct+'%</div>';
+  h+='<div style="width:54px;height:6px;border-radius:3px;background:var(--bg4);overflow:hidden"><div style="height:100%;border-radius:3px;width:'+_pct+'%;background:'+_pctColor+';transition:width .3s"></div></div>';
+  h+='<div style="font-size:9px;color:var(--tx4)">'+_done+'/'+_vph.length+' phases</div>';
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="cad-chip" style="margin-left:0"><div class="cad-l">CAD</div><div class="cad-v">'+(c.cad?fD(c.cad):'--')+'</div></div>';
+  h+='</div>';
+  // Pending phases row — full width strip below the meta row
+  if(_pending.length>0){
+    h+='<div style="padding:5px 13px 8px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;cursor:pointer;border-top:1px solid var(--brd)" onclick="toggleCard(\''+c.id+'\')">'; 
+    h+='<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);flex-shrink:0">'+(tmpl.displaySettings?.statusLabel||'Status')+'</span>';
+    _pending.forEach(vp=>{
+      const _ecd2=vp.ph.items.find(i=>i.isEcd);
+      const _date2=_ecd2&&_ecd2.ecdDate?(_ecd2.ecdDate.match(/^\d{4}-\d{2}-\d{2}$/)?fD(_ecd2.ecdDate):_ecd2.ecdDate):'';
+      const _cond2=_ecd2&&_ecd2.ecdCond?_ecd2.ecdCond:'';
+      const _val2=_date2&&_cond2?_date2+' · '+_cond2:_date2||_cond2||'None';
+      const _col2=_date2?'var(--amb3)':_cond2?'var(--blue3)':'var(--tx4)';
+      h+='<span style="display:inline-flex;align-items:baseline;gap:4px">'
+        +'<span style="font-size:11px;font-weight:600;color:var(--tx2)">'+vp.short+'</span>'
+        +'<span style="font-size:10px;color:'+_col2+'">'+_val2+'</span>'
+        +'</span>';
+    });
+    h+='</div>';
+  }
+  if(isOpen){
+    const pTab=ui.phTab[c.id]??c.currentPhase;
+    const iTab=ui.iTab[c.id]||'cl';
+    h+='<div class="ccard-body">';
+    h+=renderPL(c,pTab,'circuits');
+    h+='<div class="itabs">';
+    h+='<button class="itab '+(iTab==='cl'?'on':'')+'" onclick="setIT(\''+c.id+'\',\'cl\')">Checklist &amp; fields</button>';
+    h+='<button class="itab '+(iTab==='hist'?'on':'')+'" onclick="setIT(\''+c.id+'\',\'hist\')">History</button>';
+    h+='</div>';
+    h+=iTab==='cl'?renderDetail(c,pTab,'circuits'):renderHist(c);
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function renderPL(c,pTab,src){
+  const vph=visPh(c);
+  const total=vph.length;
+  const doneCount=vph.filter(vp=>vp.ph.done).length;
+  const pct=total>0?Math.round((doneCount/total)*100):0;
+  let h='<div class="pipeline">';
+  // Big progress bar with 10% markers
+  const fillCls=pct===100?'pl-fill-done':pct>0?'pl-fill-act':'pl-fill-pend';
+  h+='<div class="pl-track" title="Overall progress: '+pct+'%">';
+  for(let m=10;m<100;m+=10){h+='<div class="pl-mark" style="left:'+m+'%"></div>';}
+  for(let m=20;m<100;m+=20){h+='<div class="pl-mark-lbl" style="left:calc('+m+'% + 3px)">'+m+'%</div>';}
+  h+='<div class="pl-fill '+fillCls+'" style="width:'+Math.max(pct,2)+'%">';
+  if(pct>9)h+=pct+'%';
+  h+='</div></div>';
+  // Phase pills row
+  h+='<div class="pl-row">';
+  vph.forEach(vp=>{
+    const ph=vp.ph,isA=vp.idx===c.currentPhase&&!ph.done,isSel=vp.idx===pTab;
+    const icoCls=ph.done?'pl-done-ico':ph.skipped?'pl-skip-ico':isA?'pl-act-ico':'pl-pend-ico';
+    const lblCls=ph.done?'pl-done':ph.skipped?'pl-skip':isA?'pl-act':'';
+    const ic=ph.done?'ti-check':ph.skipped?'ti-minus':isA?'ti-loader':'ti-circle';
+    h+='<div style="display:flex;align-items:center;gap:4px;cursor:pointer;opacity:'+(isSel?'1':'.65')+';padding:2px 6px;border-radius:5px;background:'+(isSel?'var(--blue2)':'transparent')+';border:'+(isSel?'1px solid var(--blue3)':'1px solid transparent')+'" onclick="setPT(\''+c.id+'\','+vp.idx+',\''+src+'\')" title="'+ph.label+(ph.date?' ('+fD(ph.date)+')':'')+'">';
+    h+='<div class="pl-icon '+icoCls+'"><i class="ti '+ic+'" style="font-size:9px"></i></div>';
+    h+='<span class="pl-phase-lbl '+lblCls+'">'+vp.short+'</span>';
+    if(ph.done&&ph.date)h+='<span style="font-size:8px;color:var(--tx4)">'+fD(ph.date)+'</span>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+
+function renderDetail(c,pTab,src){
+  const ph=c.phases[pTab],vph=visPh(c),isDark=c.isDark,isArch=src==='archive';
+  let tH='<div class="dtabs">';
+  vph.forEach(vp=>{const p=vp.ph,ac=vp.idx===pTab;tH+='<button class="dtab '+(ac?'on ':'')+( p.done?'dt-done ':p.skipped?'dt-skip ':'')+'" onclick="setPT(\''+c.id+'\','+vp.idx+',\''+src+'\')">'+(p.done?'&#10003; ':p.skipped?'-- ':'')+vp.short+'</button>';});
+  tH+='</div>';
+  const items=ph.items.filter(i=>!i.label.includes('dark fiber')||isDark);
+  const done=items.filter(i=>i.done).length;
+  let clH='';
+  if(ph.skipped){
+    clH='<div class="skip-note"><i class="ti ti-minus"></i> LOA &amp; XC skipped for dark fiber</div>';
+  } else {
+    clH='<div class="cl">';
+    items.forEach(item=>{
+      const ri=ph.items.indexOf(item);
+      const lnks=(item.links||[]).map((l,li)=>'<div class="nlink"><i class="ti ti-link" style="font-size:10px;color:var(--tx4)"></i><a href="'+l.url+'" target="_blank" rel="noopener">'+( l.label||l.url)+'</a><button class="ico-btn" style="width:16px;height:16px" onclick="rmIL(\''+c.id+'\','+pTab+','+ri+','+li+',\''+src+'\')"><i class="ti ti-x" style="font-size:10px"></i></button></div>').join('');
+      const ecdLabel=tmpl.ecdLabel||'Expected';
+      const ecdR=item.isEcd?('<div class="ecd-row" style="flex-wrap:wrap;gap:4px">'
+        +'<input class="ecd-d" type="text" value="'+(item.ecdDate||'').replace(/"/g,'&quot;')+'" placeholder="Date or text (e.g. Q3 2026)" data-cid="'+c.id+'" data-ph="'+pTab+'" data-idx="'+ri+'" data-f="ecdDate" data-src="'+src+'" onchange="updIF(this)" style="flex:1;min-width:120px">'
+        +'<input type="date" style="width:34px;padding:2px;border:1px solid var(--brd);border-radius:5px;background:var(--bg2);cursor:pointer" title="Pick a date" onchange="setEcdFromPicker(this,\''+c.id+'\','+pTab+','+ri+',\''+src+'\')"> '
+        +'<input class="ecd-c" type="text" value="'+(item.ecdCond||'').replace(/"/g,'&quot;')+'" placeholder="Conditions / phrase..." data-cid="'+c.id+'" data-ph="'+pTab+'" data-idx="'+ri+'" data-f="ecdCond" data-src="'+src+'" onchange="updIF(this)">'
+        +'</div>'):'';
+      clH+='<div class="ci" draggable="true" ondragstart="ciDS(event,\''+c.id+'\','+pTab+','+ri+',\''+src+'\')" ondragover="ciDO(event)" ondrop="ciDrop(event,\''+c.id+'\','+pTab+','+ri+',\''+src+'\')">';
+      clH+='<div class="ci-chk '+(item.done?'on':'')+'" onclick="togCI(\''+c.id+'\','+pTab+','+ri+',\''+src+'\')">'+(item.done?'<i class="ti ti-check" style="font-size:9px"></i>':'')+'</div>';
+      clH+='<i class="ti ti-grip-vertical" style="color:var(--tx4);font-size:11px;cursor:grab;flex-shrink:0;margin-top:3px"></i>';
+      clH+='<div class="ci-r">';
+      clH+='<div class="ci-lw"><input class="ci-li '+(item.done?'struck':'')+'" value="'+(item.isEcd?(tmpl.ecdLabel||'Expected'):item.label).replace(/"/g,'&quot;')+'" '+(item.isEcd?'disabled':'')+' data-cid="'+c.id+'" data-ph="'+pTab+'" data-idx="'+ri+'" data-src="'+src+'" onchange="renameCI(this)"><button class="ico-btn" style="width:16px;height:16px" onclick="rmCI(\''+c.id+'\','+pTab+','+ri+',\''+src+'\')" title="Remove"><i class="ti ti-x" style="font-size:10px"></i></button></div>';
+      if(item.done&&item.date)clH+='<div class="ci-date"><i class="ti ti-check" style="font-size:9px"></i> '+fD(item.date)+'</div>';
+      clH+=ecdR;
+      if(lnks)clH+='<div class="note-links">'+lnks+'</div>';
+      clH+='<input class="ci-note" placeholder="Note or paste URL..." value="'+(item.note||'').replace(/"/g,'&quot;')+'" data-cid="'+c.id+'" data-ph="'+pTab+'" data-idx="'+ri+'" data-src="'+src+'" onchange="hNote(this)">';
+      clH+='</div></div>';
+    });
+    clH+='</div>';
+    clH+='<button class="add-btn" onclick="addCI(\''+c.id+'\','+pTab+',\''+src+'\')"><i class="ti ti-plus" style="font-size:11px"></i> Add item</button>';
+  }
+  const phLinks=(ph.links||[]).map((l,li)=>'<div class="nlink"><i class="ti ti-link" style="font-size:10px;color:var(--tx4)"></i><a href="'+l.url+'" target="_blank" rel="noopener">'+(l.label||l.url)+'</a><button class="ico-btn" style="width:16px;height:16px" onclick="rmPL(\''+c.id+'\','+pTab+','+li+',\''+src+'\')"><i class="ti ti-x" style="font-size:10px"></i></button></div>').join('');
+  const isLast=pTab===ALL_PH.length-1,phDone=ph.done;
+  let footH='<div class="ph-foot"><span class="ph-prog"><strong>'+done+'</strong> / <strong>'+items.length+'</strong> done</span><div style="display:flex;gap:5px;flex-wrap:wrap">';
+  if(ph.skipped){footH+='<span style="font-size:11px;color:var(--amb3)">Skipped (dark fiber)</span>';}
+  else if(!isArch){
+    footH+=phDone?'<button class="btn btn-sm" onclick="undoP(\''+c.id+'\','+pTab+')"><i class="ti ti-arrow-back-up"></i> Mark incomplete</button>':'<button class="btn btn-sm" style="opacity:.35" disabled><i class="ti ti-arrow-back-up"></i> Mark incomplete</button>';
+    if(!phDone&&!isLast)footH+='<button class="btn btn-sm btn-blue" onclick="advPh(\''+c.id+'\','+pTab+')">Mark complete <i class="ti ti-chevron-right"></i></button>';
+    else if(!phDone&&isLast)footH+='<button class="btn btn-sm btn-green" onclick="startConf(\''+c.id+'\')"><i class="ti ti-circle-check"></i> Mark live &amp; completed</button>';
+  }
+  if(isArch)footH+='<button class="btn btn-sm btn-blue" onclick="retIF(\''+c.id+'\')"><i class="ti ti-refresh"></i> Return to in-flight</button>';
+  footH+='</div></div>';
+  const phLblRow='<div style="display:flex;align-items:center;gap:6px;margin-bottom:9px"><input class="ptitle-inp" value="'+(ph.label||ALL_PH[pTab]?.label||'').replace(/"/g,'&quot;')+'" data-cid="'+c.id+'" data-ph="'+pTab+'" data-src="'+src+'" onchange="renamePhase(this)"><button class="btn btn-xs btn-ghost" onclick="openSaveTmpl()"><i class="ti ti-template"></i></button></div>';
+  return tH+phLblRow+'<div class="two-col"><div><div class="panel"><div class="ptitle">Phase checklist</div>'+clH+'</div><div style="margin-top:9px"><div class="panel"><div class="ptitle">Phase notes</div>'+(phLinks?'<div class="note-links" style="margin-bottom:5px">'+phLinks+'</div>':'')+'<textarea class="na" placeholder="Notes -- paste URL for link..." data-cid="'+c.id+'" data-ph="'+pTab+'" data-src="'+src+'" onchange="hPhNote(this)">'+(ph.notes||'')+'</textarea></div></div>'+footH+'</div><div><div class="panel">'+renderFields(c,pTab,src)+'</div><div style="margin-top:9px"><div class="panel"><div class="ptitle">PM &amp; engineering contacts</div>'+renderContacts(c,src)+'</div></div></div></div>';
+}
+
+function renderHist(c){
+  const h=[...(c.history||[])].reverse();
+  if(!h.length)return'<div class="empty" style="padding:1rem"><i class="ti ti-history empty-icon" style="font-size:24px"></i>No history.</div>';
+  return'<div class="hist-list">'+h.map(x=>'<div class="hist-item"><span class="hist-ts">'+fTs(x.ts)+'</span><span style="color:var(--tx2);line-height:1.4">'+x.msg+'</span></div>').join('')+'</div>';
+}
+
+function fld(lbl,fkey,flkey,val,cid,listId,src){
+  src=src||'circuits';
+  let h='<div class="fg"><div class="fl"><input class="fl-i" value="'+lbl.replace(/"/g,'&quot;')+'" data-cid="'+cid+'" data-flkey="'+flkey+'" data-src="'+src+'" onchange="renameField(this)" title="Rename">';
+  h+='<button class="ico-btn" style="width:13px;height:13px" onclick="clrF(\''+cid+'\',\''+fkey+'\',\''+src+'\')" title="Clear"><i class="ti ti-eraser" style="font-size:9px"></i></button></div>';
+  h+='<input class="fi" value="'+(val||'').replace(/"/g,'&quot;')+'" placeholder="--" data-cid="'+cid+'" data-field="'+fkey+'" data-src="'+src+'" '+(listId?'list="'+listId+'"':'')+' onchange="updF(this)">';
+  if(listId)h+=dcOpts(listId);
+  h+='</div>';
+  return h;
+}
+function fr2(){return'<div class="fr">'+Array.from(arguments).join('')+'</div>';}
+
+function renderFields(c,pTab,src){
+  const k=ALL_PH[pTab].key,id=c.id;src=src||'circuits';
+  const t=tmpl.fieldLabels||{},lb=(k,d)=>t[k]||d;
+  if(k==='order')return'<div class="ptitle">Order details</div>'+fld(lb('name','Circuit name'),'name','name',c.name,id,'',src)+fld(lb('te','Transport engineer'),'transportEngineer','te',c.transportEngineer,id,'',src)+fld(lb('cid','Circuit ID'),'circuitId','cid',c.circuitId,id,'',src)+fld(lb('onum','Carrier order #'),'orderNum','onum',c.orderNum,id,'',src)+fr2(fld(lb('svc','Service type'),'serviceType','svc',c.serviceType,id,'',src),fld(lb('cap','Capacity'),'capacity','cap',c.capacity,id,'',src))+fld(lb('car','Carrier'),'carrier','car',c.carrier,id,'',src)+fr2(fld(lb('prot','Protection'),'protection','prot',c.protection,id,'',src),fld(lb('nrc','NRC'),'nrc','nrc',c.nrc,id,'',src))+fld(lb('cad','CAD'),'cad','cad',c.cad,id,'',src)+fld(lb('aend','A end'),'aEnd','aend',c.aEnd,id,'',src)+fld(lb('zend','Z end (data center)'),'zEnd','zend',c.zEnd,id,'dc-o-'+id,src);
+  if(k==='osp')return'<div class="ptitle">OSP details</div>'+fld(lb('mmp','MMP / handhole / vault'),'ospMmp','mmp',c.ospMmp,id,'',src)+fld(lb('spl','Splice location'),'ospSplice','spl',c.ospSplice,id,'',src)+fld(lb('fib','Fiber type'),'ospFiber','fib',c.ospFiber,id,'',src)+(c.isDark?fld(lb('otdr','OTDR result'),'otdrResult','otdr',c.otdrResult,id,'',src)+fld(lb('otdrdt','OTDR PDF date'),'otdrDate','otdrdt',c.otdrDate,id,'',src):'');
+  if(k==='cab_site')return'<div class="ptitle">Cab / site details</div>'+fr2(fld(lb('gend','Generator delivered'),'genDelivered','gend',c.genDelivered,id,'',src),fld(lb('ueta','Utility power ETA'),'utilityEta','ueta',c.utilityEta,id,'',src))+fld(lb('zend2','Z end (data center)'),'zEnd','zend2',c.zEnd,id,'dc-cs-'+id,src);
+  if(k==='rack')return'<div class="ptitle">Rack &amp; stack</div>'+fld(lb('colo','Colo / data center'),'coloLocation','colo',c.coloLocation,id,'dc-r-'+id,src)+fld(lb('sfpt','SFP type'),'sfpType','sfpt',c.sfpType,id,'',src)+fr2(fld(lb('sfpo','SFP ordered date'),'sfpOrdered','sfpo',c.sfpOrdered,id,'',src),fld(lb('sfpd','SFP delivered'),'sfpDelivered','sfpd',c.sfpDelivered,id,'',src));
+  if(k==='carrier_ttu')return'<div class="ptitle">Carrier TTU</div>'+fld(lb('ctd','Carrier turn-up date'),'turnupDate','ctd',c.turnupDate,id,'',src)+fr2(fld(lb('l1r','L1 test result'),'l1Result','l1r',c.l1Result,id,'',src),fld(lb('l1d','L1 test date'),'l1Date','l1d',c.l1Date,id,'',src))+(c.isDark?fld(lb('mopc','MOP (Carrier TTU)'),'mopCarrier','mopc',c.mopCarrier||'',id,'',src):'');
+  if(k==='loa_xc')return'<div class="ptitle">LOA &amp; cross connect</div>'+fld(lb('loa','LOA received date'),'loaDate','loa',c.loaDate,id,'',src)+fld(lb('rp','Router port (Hotwire)'),'routerPort','rp',c.routerPort,id,'',src)+fld(lb('vlan','VLAN'),'vlan','vlan',c.vlan,id,'',src)+fld(lb('colo2','Colo / data center'),'coloLocation','colo2',c.coloLocation,id,'dc-l-'+id,src)+fr2(fld(lb('xco','XC order #'),'xcOrderNum','xco',c.xcOrderNum,id,'',src),fld(lb('xcc','XC confirmed date'),'xcConfirmed','xcc',c.xcConfirmed,id,'',src));
+  if(k==='hwc_ttu')return'<div class="ptitle">HWC TTU</div>'+fld(lb('cpd','Completion notice date'),'completionDate','cpd',c.completionDate,id,'',src)+fld(lb('stu','SiteTracker updated'),'sitetrackerUpdated','stu',c.sitetrackerUpdated,id,'',src)+fld(lb('hws','HWC test sign-off'),'hwSignoff','hws',c.hwSignoff||'',id,'',src)+(c.isDark?fld(lb('moph','MOP (HWC TTU)'),'mopHwc','moph',c.mopHwc||'',id,'',src):'');
+  return'';
+}
+
+function renderContacts(c,src){
+  src=src||'circuits';
+  const ci=(ph,fld,val)=>'<input class="ci2" placeholder="'+ph+'" value="'+(val||'').replace(/"/g,'&quot;')+'" data-cid="'+c.id+'" data-field="'+fld+'" data-src="'+src+'" onchange="updF(this)">';
+  return'<div class="cg"><div class="cb-box"><div class="cb-lbl">Carrier PM &middot; '+(c.carrier||'carrier')+'</div>'+ci('Name','carrierPmName',c.carrierPmName)+ci('Phone','carrierPmPhone',c.carrierPmPhone)+ci('Email','carrierPmEmail',c.carrierPmEmail)+'</div><div class="cb-box"><div class="cb-lbl">Hotwire PM</div>'+ci('Name','hwPmName',c.hwPmName)+ci('Phone','hwPmPhone',c.hwPmPhone)+ci('Email','hwPmEmail',c.hwPmEmail)+'</div><div class="cb-box"><div class="cb-lbl">Hotwire Engineer</div>'+ci('Name','hwEngName',c.hwEngName)+'</div><div class="cb-box"><div class="cb-lbl">Transport Engineer</div>'+ci('Name','transportEngineer',c.transportEngineer)+'</div></div>';
+}
+
+function renderQueue(){
+  const q=(ui.qSrch||'').toLowerCase();
+  let list=queue.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
+  let h='<div class="toolbar"><input class="sinp" placeholder="Search queue..." value="'+(ui.qSrch||'').replace(/"/g,'&quot;')+'" oninput="setQS(this.value)" style="max-width:220px"></div>';
+  if(!list.length)return h+'<div class="empty"><i class="ti ti-clock-pause empty-icon"></i>'+(queue.length===0?'No circuits in queue. Click <strong>New circuit</strong> to add one.':'No results.')+'</div>';
+  list.forEach(c=>{
+    const prot=c.protection==='Protected'?'<span class="prot-y">Protected</span>':'<span class="prot-n">Unprotected</span>';
+    h+='<div class="acard" id="qc-'+c.id+'">';
+    h+='<div class="acard-top">';
+    h+='<span class="acard-name">'+dn(c)+'</span>';
+    h+='<div style="display:flex;align-items:center;gap:5px"><span class="spl" style="background:var(--pur);color:var(--pur3)"><span class="dot" style="background:var(--pur3)"></span>In queue</span>'+(c.cad?'<span style="font-size:10px;color:var(--tx4)">CAD '+fD(c.cad)+'</span>':'')+'</div>';
+    h+='</div>';
+    h+='<div class="acard-meta">'
+      +(c.circuitId?'<span class="cid-chip">'+c.circuitId+'</span>':'')
+      +'<span class="tbadge">'+(c.serviceType||'--')+'</span>'+prot
+      +'<span style="font-size:11px;color:var(--tx3)">'+(c.carrier||'--')+' &middot; '+(c.aEnd||'--')+' &rarr; '+(c.zEnd||'--')+'</span>'
+      +(c.transportEngineer?'<span class="eng-chip"><i class="ti ti-user-bolt" style="font-size:9px"></i><span style="font-size:9px;opacity:.75;margin-right:2px">'+(tmpl.displaySettings?.engLabel||'TE')+'</span>'+c.transportEngineer+'</span>':'')
+      +'<div class="cad-chip" style="margin-left:auto"><div class="cad-l">CAD</div><div class="cad-v">'+(c.cad?fD(c.cad):'--')+'</div></div>'
+      +'</div>';
+    h+='<div class="act-row">';
+    h+='<button class="btn btn-sm btn-blue" onclick="queueToIF(\''+c.id+'\')"><i class="ti ti-player-play"></i> Move to In Flight</button>';
+    h+='<button class="btn btn-sm btn-red" onclick="delFromQ(\''+c.id+'\')"><i class="ti ti-trash"></i> Delete</button>';
+    h+='</div></div>';
+  });
+  return h;
+}
+function renderCompleted(){
+  const q=(ui.compSrch||'').toLowerCase();
+  let list=completed.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
+  let h='<div class="toolbar"><input class="sinp" placeholder="Search completed..." value="'+(ui.compSrch||'').replace(/"/g,'&quot;')+'" oninput="setCS(this.value)" style="max-width:220px"></div>';
+  if(!list.length)return h+'<div class="empty"><i class="ti ti-circle-check empty-icon"></i>'+(completed.length===0?'No completed circuits yet. Circuits appear here after Mark live &amp; completed.':'No results.')+'</div>';
+  list.forEach(c=>{
+    const isSel=ui.compSel===c.id;
+    const prot=c.protection==='Protected'?'<span class="prot-y">Protected</span>':'<span class="prot-n">Unprotected</span>';
+    const _vph=visPh(c);const _done=_vph.filter(v=>v.ph.done).length;
+    const _pct=_vph.length>0?Math.round((_done/_vph.length)*100):0;
+    h+='<div class="acard">';
+    h+='<div class="acard-top" onclick="togCS(\''+c.id+'\')">';
+    h+='<span class="acard-name">'+dn(c)+'</span>';
+    h+='<div style="display:flex;align-items:center;gap:6px">';
+    h+='<span class="spl" style="background:var(--green2);color:var(--green3)"><span class="dot d-green"></span>Completed</span>';
+    h+='<span style="font-size:11px;font-weight:700;color:var(--green3)">'+_pct+'%</span>';
+    h+='<span style="font-size:10px;color:var(--tx4)">'+(c.completedAt?fD(c.completedAt.split('T')[0]):'--')+'</span>';
+    h+='</div></div>';
+    h+='<div class="acard-meta" onclick="togCS(\''+c.id+'\')">'
+      +(c.circuitId?'<span class="cid-chip">'+c.circuitId+'</span>':'')
+      +'<span class="tbadge">'+(c.serviceType||'--')+'</span>'+prot
+      +'<span style="font-size:11px;color:var(--tx3)">'+(c.carrier||'--')+' &middot; '+(c.aEnd||'--')+' &rarr; '+(c.zEnd||'--')+'</span>'
+      +(c.transportEngineer?'<span class="eng-chip"><i class="ti ti-user-bolt" style="font-size:9px"></i><span style="font-size:9px;opacity:.75;margin-right:2px">'+(tmpl.displaySettings?.engLabel||'TE')+'</span>'+c.transportEngineer+'</span>':'')
+      +'</div>';
+    if(isSel){
+      const pTab=ui.compPh[c.id]??c.currentPhase;
+      const iTab=ui.compIT[c.id]||'cl';
+      h+='<div class="acard-det">'+renderPL(c,pTab,'completed')+'<div class="itabs"><button class="itab '+(iTab==='cl'?'on':'')+'" onclick="setCompIT(\''+c.id+'\',\'cl\')">Checklist &amp; fields</button><button class="itab '+(iTab==='hist'?'on':'')+'" onclick="setCompIT(\''+c.id+'\',\'hist\')">History</button></div>'+(iTab==='cl'?renderDetail(c,pTab,'completed'):renderHist(c))+'</div>';
+    }
+    h+='<div class="act-row">';
+    h+='<button class="btn btn-sm btn-amb" onclick="compToArch(\''+c.id+'\')"><i class="ti ti-archive"></i> Move to Archive</button>';
+    h+='<button class="btn btn-sm" onclick="compToIF(\''+c.id+'\')"><i class="ti ti-refresh"></i> Return to In Flight</button>';
+    h+='<button class="btn btn-sm btn-red" onclick="softDelComp(\''+c.id+'\')"><i class="ti ti-trash"></i> Delete</button>';
+    h+='</div></div>';
+  });
+  return h;
+}
+function renderArch(){
+  const q=(ui.archSrch||'').toLowerCase();
+  let list=archive.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
+  let h='<div class="toolbar"><input class="sinp" placeholder="Search archive..." value="'+(ui.archSrch||'').replace(/"/g,'&quot;')+'" oninput="setAS(this.value)"></div>';
+  if(!list.length)return h+'<div class="empty"><i class="ti ti-archive empty-icon"></i>'+(archive.length===0?'No archived circuits.':'No results.')+'</div>';
+  list.forEach(c=>{
+    const isSel=ui.archSel===c.id,pTab=ui.archPh[c.id]??c.currentPhase,iTab=ui.archIT[c.id]||'cl';
+    const prot=c.protection==='Protected'?'<span class="prot-y">Protected</span>':'<span class="prot-n">Unprotected</span>';
+    h+='<div class="acard '+(c.urgent?'urg':'')+'">';
+    h+='<div class="acard-top" onclick="togAS(\''+c.id+'\')">';
+    h+='<span class="acard-name">'+dn(c)+'</span>';
+    h+='<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+(c.priority===2?'<span class="urg-btn urg-on">&#128308; Urgent</span>':c.priority===1?'<span class="urg-btn urg-warn">&#128993; Warning</span>':(c.urgent?'<span class="urg-btn urg-on">&#128308; Urgent</span>':''))+'<span class="spl sp-l"><span class="dot d-green"></span>Archived</span><span style="font-size:10px;color:var(--tx4)">'+(c.archivedAt?fD(c.archivedAt.split('T')[0]):'--')+'</span></div>';
+    h+='</div>';
+    h+='<div class="acard-meta" onclick="togAS(\''+c.id+'\')">'+(c.circuitId?'<span class="cid-chip">'+c.circuitId+'</span>':'')+'<span class="tbadge">'+(c.serviceType||'--')+'</span>'+prot+'<span style="font-size:11px;color:var(--tx3)">'+(c.carrier||'--')+' &middot; '+(c.aEnd||'--')+' &rarr; '+(c.zEnd||'--')+'</span>'+(c.transportEngineer?'<span class="eng-chip"><i class="ti ti-user-bolt" style="font-size:9px"></i><span style="font-size:9px;opacity:.75;margin-right:2px">'+(tmpl.displaySettings?.engLabel||'TE')+'</span>'+c.transportEngineer+'</span>':'')+'<span style="font-size:10px;color:var(--tx4);margin-left:auto">Turned up '+(c.turnupDate?fD(c.turnupDate):'--')+'</span></div>';
+    if(isSel){
+      h+='<div class="acard-det">'+renderPL(c,pTab,'archive')+'<div class="itabs"><button class="itab '+(iTab==='cl'?'on':'')+'" onclick="setAIT(\''+c.id+'\',\'cl\')">Checklist &amp; fields</button><button class="itab '+(iTab==='hist'?'on':'')+'" onclick="setAIT(\''+c.id+'\',\'hist\')">History</button></div>'+(iTab==='cl'?renderDetail(c,pTab,'archive'):renderHist(c))+'</div>';
+    }
+    h+='<div class="act-row"><button class="btn btn-sm btn-blue" onclick="retIF(\''+c.id+'\')"><i class="ti ti-refresh"></i> Return to in-flight</button><button class="btn btn-sm btn-red" onclick="softDelA(\''+c.id+'\')"><i class="ti ti-trash"></i> Delete</button></div>';
+    h+='</div>';
+  });
+  return h;
+}
+
+function renderDel(){
+  const q=(ui.delSrch||'').toLowerCase();
+  let list=deleted.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType].some(v=>(v||'').toLowerCase().includes(q)));
+  let h='<div class="toolbar"><input class="sinp" placeholder="Search deleted..." value="'+(ui.delSrch||'').replace(/"/g,'&quot;')+'" oninput="setDS(this.value)"></div><div class="alert a-risk"><div class="a-ico" style="background:var(--amb3);color:#412402"><i class="ti ti-clock"></i></div>Deleted circuits kept 30 days, then auto-purged.</div>';
+  if(!list.length)return h+'<div class="empty"><i class="ti ti-trash empty-icon"></i>'+(deleted.length===0?'No deleted circuits.':'No results.')+'</div>';
+  list.forEach(c=>{
+    const exp=c.deletedAt?Math.ceil((new Date(c.deletedAt).getTime()+30*864e5-Date.now())/864e5):30;
+    h+='<div class="acard"><div class="acard-top"><span class="acard-name">'+dn(c)+'</span><div style="display:flex;align-items:center;gap:5px"><span class="spl sp-d"><span class="dot d-red"></span>Deleted</span><span style="font-size:10px;color:var(--red3)">Expires '+exp+'d</span></div></div><div class="acard-meta"><span class="tbadge">'+(c.serviceType||'--')+'</span><span style="font-size:11px;color:var(--tx3)">'+(c.carrier||'--')+' &middot; '+(c.aEnd||'--')+' &rarr; '+(c.zEnd||'--')+'</span></div><div class="act-row"><button class="btn btn-sm btn-blue" onclick="restIF(\''+c.id+'\')"><i class="ti ti-refresh"></i> Restore to in-flight</button><button class="btn btn-sm" onclick="restA(\''+c.id+'\')"><i class="ti ti-archive"></i> Restore to archive</button><button class="btn btn-sm btn-red" onclick="permDel(\''+c.id+'\')"><i class="ti ti-trash-x"></i> Permanently delete</button></div></div>';
+  });
+  return h;
+}
+
+function renderAlertsSettings(){
+  if(!tmpl.alerts||!tmpl.alerts.length)tmpl.alerts=getDefaultAlerts();
+  let h='<div class="ssec"><div class="stitle"><i class="ti ti-bell"></i> Alert rules &mdash; control which alerts appear and when</div>';
+  h+='<div style="font-size:11px;color:var(--tx3);margin-bottom:10px">Each alert can be toggled on/off, renamed, and its trigger threshold adjusted. Changes take effect immediately.</div>';
+  tmpl.alerts.forEach((al,ai)=>{
+    h+='<div style="border:1px solid var(--brd);border-radius:var(--r2);padding:12px;margin-bottom:10px;background:var(--bg2)">';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">';
+    h+='<button class="stog '+(al.enabled!==false?'on':'off')+'" onclick="togAlert('+ai+')"></button>';
+    h+='<input style="font-size:13px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+al.label.replace(/"/g,'&quot;')+'" data-ai="'+ai+'" onchange="updAlert(this,\'label\')" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'">';
+    h+='<input type="color" value="'+(al.color||'#888888')+'" data-ai="'+ai+'" onchange="updAlert(this,\'color\')" style="width:34px;height:24px;border:1px solid var(--brd);border-radius:4px;padding:1px;cursor:pointer" title="Alert color">';
+    if(ai>3)h+='<button class="btn btn-xs btn-red" onclick="rmAlert('+ai+')"><i class="ti ti-trash"></i></button>';
+    h+='</div>';
+    h+='<textarea style="width:100%;font-size:11px;background:var(--bg3);border:1px solid var(--brd);border-radius:5px;padding:4px 8px;color:var(--tx2);resize:none;height:36px" data-ai="'+ai+'" onchange="updAlert(this,\'description\')" placeholder="Description...">'+al.description+'</textarea>';
+    h+='<div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">';
+    if(al.days!=null){
+      h+='<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)"><span>Trigger within</span><input type="number" min="1" max="365" value="'+al.days+'" data-ai="'+ai+'" onchange="updAlert(this,\'days\')" style="width:60px;font-size:11px;border:1px solid var(--brd);border-radius:5px;padding:3px 6px;background:var(--bg2);color:var(--tx2)"><span>days</span></div>';
+    }
+    if(al.threshold!=null){
+      h+='<div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2)"><span>Trigger at</span><input type="number" min="1" max="9999" value="'+al.threshold+'" data-ai="'+ai+'" onchange="updAlert(this,\'threshold\')" style="width:70px;font-size:11px;border:1px solid var(--brd);border-radius:5px;padding:3px 6px;background:var(--bg2);color:var(--tx2)"><span>circuits</span></div>';
+    }
+    h+='<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx3);cursor:pointer"><input type="checkbox" '+(al.metric?'checked':'')+' data-ai="'+ai+'" onchange="updAlert(this,\'metric\')"> Show in metric box</label>';
+    h+='</div></div>';
+  });
+  h+='<div style="display:flex;gap:8px;margin-top:6px">';
+  h+='<button class="btn btn-sm btn-blue" onclick="addAlert()"><i class="ti ti-plus"></i> Add alert rule</button>';
+  h+='<button class="btn btn-sm btn-ghost" onclick="resetAlerts()"><i class="ti ti-refresh"></i> Reset to defaults</button>';
+  h+='</div></div>';
+  return h;
+}
+function getDefaultAlerts(){return[
+  {id:'risk',enabled:true,label:'At risk',description:'ECD is within N days of CAD',days:30,color:'#D08840',metric:true},
+  {id:'urgent',enabled:true,label:'Urgent',description:'Circuit manually flagged urgent',days:null,color:'#D06060',metric:true},
+  {id:'sfp',enabled:true,label:'SFP order needed',description:'SFP not ordered within N days of rack ECD',days:30,color:'#4A7AB5',metric:false},
+  {id:'cap',enabled:true,label:'Capacity warning',description:'In-flight circuit count reaches N',days:null,threshold:40,color:'#C04040',metric:false}
+];}
+window.togAlert=ai=>{if(!tmpl.alerts)return;const _al=tmpl.alerts[ai];_al.enabled=!(_al.enabled!==false);ui.settingsDirty=true;gLog('settings','Alert ['+_al.label+']: '+(_al.enabled?'enabled':'disabled'));renderApp();};
+window.updAlert=(el,field)=>{if(!tmpl.alerts)return;const ai=+el.dataset.ai;let val=el.type==='checkbox'?el.checked:el.type==='number'?(+el.value||0):el.value;tmpl.alerts[ai][field]=val;sv(TK,tmpl);if(field!=='description'&&field!=='label')renderApp();};
+window.rmAlert=ai=>{if(!tmpl.alerts||ai<=3)return;if(!confirm('Remove this alert rule?'))return;tmpl.alerts.splice(ai,1);sv(TK,tmpl);renderApp();};
+window.addAlert=()=>{if(!tmpl.alerts)tmpl.alerts=getDefaultAlerts();tmpl.alerts.push({id:'custom-'+Date.now(),enabled:true,label:'New alert',description:'Custom alert rule',days:30,color:'#888888',metric:false});sv(TK,tmpl);renderApp();};
+window.resetAlerts=()=>{if(!confirm('Reset alerts to defaults?'))return;tmpl.alerts=getDefaultAlerts();sv(TK,tmpl);showMsg('Alerts reset to defaults.');renderApp();};
+function renderReference(){
+  if(!tmpl.reference)tmpl.reference=defTmpl().reference;
+  const ref=tmpl.reference;
+
+  // ── Titles ──
+  const aTitle=ref.acronymsTitle||'Acronyms';
+  const rTitle=ref.rulesTitle||'Rules & Guidelines';
+  const lTitle=ref.linksTitle||'Key Websites & Tickets';
+
+  let h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">';
+
+  // ── LEFT COLUMN: Acronyms ──
+  h+='<div class="ssec" style="margin-bottom:0">';
+  h+='<div class="stitle" style="display:flex;align-items:center;gap:6px">';
+  h+='<i class="ti ti-abc"></i>';
+  h+='<input style="font-size:12px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+aTitle.replace(/"/g,'&quot;')+'" onchange="updRefTitle(\'acronymsTitle\',this.value)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Section title">';
+  h+='</div>';
+  h+='<div style="font-size:10px;color:var(--tx3);margin-bottom:8px">Click any term or definition to edit inline.</div>';
+  (ref.acronyms||[]).forEach((a,ai)=>{
+    h+='<div style="display:flex;align-items:flex-start;gap:6px;padding:5px 0;border-bottom:1px solid var(--brd)">';
+    h+='<input style="font-size:11px;font-weight:700;color:var(--blue3);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;width:70px;flex-shrink:0" value="'+a.term.replace(/"/g,'&quot;')+'" data-sec="acronyms" data-idx="'+ai+'" data-f="term" onchange="updRefItem(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="TERM">';
+    h+='<input style="font-size:11px;color:var(--tx2);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+a.def.replace(/"/g,'&quot;')+'" data-sec="acronyms" data-idx="'+ai+'" data-f="def" onchange="updRefItem(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Definition...">';
+    h+='<button class="ico-btn" onclick="rmRefItem(\'acronyms\','+ai+')" title="Remove"><i class="ti ti-x" style="font-size:10px"></i></button>';
+    h+='</div>';
+  });
+  h+='<button class="add-btn" onclick="addRefItem(\'acronyms\')" style="margin-top:6px"><i class="ti ti-plus" style="font-size:11px"></i> Add acronym</button>';
+  h+='</div>';
+
+  // ── RIGHT COLUMN: Rules ──
+  h+='<div class="ssec" style="margin-bottom:0">';
+  h+='<div class="stitle" style="display:flex;align-items:center;gap:6px">';
+  h+='<i class="ti ti-shield-check"></i>';
+  h+='<input style="font-size:12px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+rTitle.replace(/"/g,'&quot;')+'" onchange="updRefTitle(\'rulesTitle\',this.value)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Section title">';
+  h+='</div>';
+  h+='<div style="font-size:10px;color:var(--tx3);margin-bottom:8px">Click to edit rules. These are visible only in settings.</div>';
+  (ref.rules||[]).forEach((r2,ri)=>{
+    h+='<div style="border:1px solid var(--brd);border-radius:var(--r);padding:8px;margin-bottom:7px">';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">';
+    h+='<i class="ti ti-point-filled" style="color:var(--blue3);font-size:10px;flex-shrink:0"></i>';
+    h+='<input style="font-size:11px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+r2.title.replace(/"/g,'&quot;')+'" data-sec="rules" data-idx="'+ri+'" data-f="title" onchange="updRefItem(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Rule title...">';
+    h+='<button class="ico-btn" onclick="rmRefItem(\'rules\','+ri+')" title="Remove"><i class="ti ti-x" style="font-size:10px"></i></button>';
+    h+='</div>';
+    h+='<textarea style="width:100%;font-size:11px;color:var(--tx2);background:var(--bg3);border:1px solid var(--brd);border-radius:4px;padding:4px 7px;resize:vertical;min-height:44px;outline:none" data-sec="rules" data-idx="'+ri+'" data-f="body" onchange="updRefItem(this)" onfocus="this.style.borderColor=\'var(--blue3)\'" onblur="this.style.borderColor=\'var(--brd)\'" placeholder="Describe the rule...">'+r2.body.replace(/</g,'&lt;')+'</textarea>';
+    h+='</div>';
+  });
+  h+='<button class="add-btn" onclick="addRefItem(\'rules\')" style="margin-top:4px"><i class="ti ti-plus" style="font-size:11px"></i> Add rule</button>';
+  h+='</div>';
+
+  h+='</div>'; // end grid
+
+  // ── BOTTOM FULL-WIDTH: Key Websites ──
+  h+='<div class="ssec" style="margin-top:14px">';
+  h+='<div class="stitle" style="display:flex;align-items:center;gap:6px">';
+  h+='<i class="ti ti-link"></i>';
+  h+='<input style="font-size:12px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+lTitle.replace(/"/g,'&quot;')+'" onchange="updRefTitle(\'linksTitle\',this.value)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Section title">';
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;margin-top:4px">';
+  (ref.links||[]).forEach((lk,li)=>{
+    h+='<div style="border:1px solid var(--brd);border-radius:var(--r);padding:9px 11px;background:var(--bg2)">';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">';
+    h+='<i class="ti ti-world" style="color:var(--blue3);font-size:13px;flex-shrink:0"></i>';
+    h+='<input style="font-size:12px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;flex:1" value="'+lk.label.replace(/"/g,'&quot;')+'" data-sec="links" data-idx="'+li+'" data-f="label" onchange="updRefItem(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Site name">';
+    h+='<button class="ico-btn" onclick="rmRefItem(\'links\','+li+')" title="Remove"><i class="ti ti-x" style="font-size:10px"></i></button>';
+    h+='</div>';
+    h+='<input style="width:100%;font-size:11px;color:var(--blue3);background:transparent;border:1px solid var(--brd);border-radius:4px;padding:3px 7px;outline:none;margin-bottom:4px" value="'+lk.url.replace(/"/g,'&quot;')+'" data-sec="links" data-idx="'+li+'" data-f="url" onchange="updRefItem(this)" placeholder="https://..." onfocus="this.style.borderColor=\'var(--blue3)\'" onblur="this.style.borderColor=\'var(--brd)\'">';
+    h+='<input style="width:100%;font-size:10px;color:var(--tx3);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none" value="'+(lk.desc||'').replace(/"/g,'&quot;')+'" data-sec="links" data-idx="'+li+'" data-f="desc" onchange="updRefItem(this)" placeholder="Description..." onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'">';
+    h+='<div style="margin-top:6px"><a href="'+lk.url+'" target="_blank" rel="noopener" style="font-size:10px"><i class="ti ti-external-link" style="font-size:10px"></i> Open link</a></div>';
+    h+='</div>';
+  });
+  h+='<div style="display:flex;align-items:center;justify-content:center;border:1px dashed var(--brd2);border-radius:var(--r);padding:14px;cursor:pointer;color:var(--tx4)" onclick="addRefItem(\'links\')"><i class="ti ti-plus" style="font-size:13px;margin-right:5px"></i> Add website</div>';
+  h+='</div></div>';
+  return h;
+}
+window.updRefTitle=(key,val)=>{if(!tmpl.reference)tmpl.reference=defTmpl().reference;tmpl.reference[key]=val;ui.settingsDirty=true;};
+window.updRefItem=function(el){if(!tmpl.reference)tmpl.reference=defTmpl().reference;var sec=el.dataset.sec,idx=+el.dataset.idx,f=el.dataset.f;var arr=tmpl.reference[sec];if(!arr||arr[idx]===undefined)return;arr[idx][f]=el.value;ui.settingsDirty=true;};
+window.addRefItem=function(sec){if(!tmpl.reference)tmpl.reference=defTmpl().reference;if(!tmpl.reference[sec])tmpl.reference[sec]=[];if(sec==='acronyms')tmpl.reference.acronyms.push({term:'NEW',def:'Definition here'});else if(sec==='rules')tmpl.reference.rules.push({title:'New rule',body:'Describe the rule here'});else if(sec==='links')tmpl.reference.links.push({label:'New site',url:'https://',desc:''});ui.settingsDirty=true;renderApp();};
+window.rmRefItem=function(sec,idx){if(!tmpl.reference||!tmpl.reference[sec])return;var item=tmpl.reference[sec][idx];var label=item.term||item.title||item.label||'this item';if(!confirm('Remove "'+label+'" from '+sec+'?'))return;tmpl.reference[sec].splice(idx,1);ui.settingsDirty=true;renderApp();};
+
+function renderAdmin(){
+  const ADMIN_KEY='hwct_admin';
+  const stored=fo(ADMIN_KEY);
+  const hasPass=!!(stored&&stored.hash);
+  const isAuth=ui.adminAuthed===true;
+  let h='<div class="ssec"><div class="stitle"><i class="ti ti-shield-lock"></i> Admin settings</div>';
+  if(!hasPass){
+    // No password set yet
+    h+='<div style="font-size:11px;color:var(--tx3);margin-bottom:12px">No admin password is set. Set one to protect settings from being changed by others.</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;max-width:360px">';
+    h+='<div><label class="flbl">New password</label><input class="sinp2" type="password" id="adm-pw1" placeholder="Enter password" style="width:100%"></div>';
+    h+='<div><label class="flbl">Confirm password</label><input class="sinp2" type="password" id="adm-pw2" placeholder="Confirm password" style="width:100%"></div>';
+    h+='<button class="btn btn-blue btn-sm" onclick="setAdminPass()"><i class="ti ti-lock"></i> Set admin password</button>';
+    h+='</div>';
+  } else if(!isAuth){
+    // Has password, not yet authenticated
+    h+='<div style="font-size:11px;color:var(--tx3);margin-bottom:12px">Settings are protected. Enter the admin password to make changes.</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:8px;max-width:360px">';
+    h+='<div><label class="flbl">Admin password</label><input class="sinp2" type="password" id="adm-login" placeholder="Enter admin password" style="width:100%" onkeydown="if(event.key===\'Enter\')loginAdmin()"></div>';
+    h+='<button class="btn btn-blue btn-sm" onclick="loginAdmin()"><i class="ti ti-login"></i> Unlock settings</button>';
+    h+='</div>';
+    h+='<div style="margin-top:18px;padding:12px;background:var(--amb2);border:1px solid var(--amb3);border-radius:var(--r);max-width:420px">';
+    h+='<div style="font-size:12px;font-weight:600;color:var(--amb3);margin-bottom:6px"><i class="ti ti-help-circle"></i> Forgot your password?</div>';
+    h+='<div style="font-size:11px;color:var(--tx2);line-height:1.7">To reset the admin password you must access your browser console:<br>';
+    h+='<strong>1.</strong> Open browser DevTools (F12 or right-click &rarr; Inspect).<br>';
+    h+='<strong>2.</strong> Go to the <strong>Console</strong> tab.<br>';
+    h+='<strong>3.</strong> Type exactly: <code style="background:var(--bg4);padding:1px 5px;border-radius:3px;font-size:11px;color:var(--blue3)">localStorage.removeItem("hwct_admin")</code> and press Enter.<br>';
+    h+='<strong>4.</strong> Refresh the page. The password will be cleared and you can set a new one.</div>';
+    h+='</div>';
+  } else {
+    // Authenticated
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span style="font-size:12px;color:var(--green3)"><i class="ti ti-shield-check"></i> Admin access granted</span><button class="btn btn-xs btn-ghost" onclick="logoutAdmin()">Lock</button></div>';
+    h+='<div style="display:flex;flex-direction:column;gap:10px;max-width:360px">';
+    h+='<div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:2px">Change password</div>';
+    h+='<div><label class="flbl">New password</label><input class="sinp2" type="password" id="adm-new1" placeholder="New password" style="width:100%"></div>';
+    h+='<div><label class="flbl">Confirm new password</label><input class="sinp2" type="password" id="adm-new2" placeholder="Confirm" style="width:100%"></div>';
+    h+='<button class="btn btn-blue btn-sm" onclick="changeAdminPass()"><i class="ti ti-lock"></i> Change password</button>';
+    h+='<div style="height:1px;background:var(--brd);margin:8px 0"></div>';
+    h+='<div style="font-size:12px;font-weight:600;color:var(--red3)">Danger zone</div>';
+    h+='<button class="btn btn-red btn-sm" onclick="removeAdminPass()"><i class="ti ti-lock-open"></i> Remove admin password</button>';
+    h+='<div style="font-size:10px;color:var(--tx4)">Removing the password allows anyone to change settings without authentication.</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+// ── Admin helpers ──
+function hashPass(p){
+  // Simple deterministic hash (not cryptographic — suitable for local use)
+  let h=0;for(let i=0;i<p.length;i++){h=(Math.imul(31,h)+p.charCodeAt(i))|0;}
+  return h.toString(16);
+}
+const ADMIN_KEY='hwct_admin';
+window.setAdminPass=()=>{
+  const p1=document.getElementById('adm-pw1')?.value;
+  const p2=document.getElementById('adm-pw2')?.value;
+  if(!p1||p1.length<4){alert('Password must be at least 4 characters.');return;}
+  if(p1!==p2){alert('Passwords do not match.');return;}
+  sv(ADMIN_KEY,{hash:hashPass(p1)});
+  ui.adminAuthed=true;
+  showMsg('Admin password set. Settings are now protected.');renderApp();
+};
+window.loginAdmin=()=>{
+  const p=document.getElementById('adm-login')?.value;
+  const stored=fo(ADMIN_KEY);
+  if(!stored||!stored.hash){ui.adminAuthed=true;renderApp();return;}
+  if(hashPass(p)===stored.hash){ui.adminAuthed=true;showMsg('Admin access granted.');renderApp();}
+  else{alert('Incorrect password.');}
+};
+window.logoutAdmin=()=>{ui.adminAuthed=false;renderApp();};
+window.changeAdminPass=()=>{
+  const p1=document.getElementById('adm-new1')?.value;
+  const p2=document.getElementById('adm-new2')?.value;
+  if(!p1||p1.length<4){alert('Password must be at least 4 characters.');return;}
+  if(p1!==p2){alert('Passwords do not match.');return;}
+  sv(ADMIN_KEY,{hash:hashPass(p1)});
+  showMsg('Password changed successfully.');renderApp();
+};
+window.removeAdminPass=()=>{
+  if(!confirm('Remove admin password? Anyone will be able to change settings.'))return;
+  localStorage.removeItem(ADMIN_KEY);
+  ui.adminAuthed=false;
+  showMsg('Admin password removed.');renderApp();
+};
+
+// ── Guard settings tabs: if admin pass is set and not authed, block all tabs except admin ──
+function isSettingsLocked(){
+  const stored=fo(ADMIN_KEY);
+  return !!(stored&&stored.hash)&&!ui.adminAuthed;
+}
+
+function renderHistoryLog(){
+  const cats={circuit:'Circuit',settings:'Settings',admin:'Admin',system:'System'};
+  const catColors={circuit:'var(--blue3)',settings:'var(--amb3)',admin:'var(--red3)',system:'var(--tx4)'};
+  const fc=ui.histCat||'';
+  const fs=(ui.histSrch||'').toLowerCase();
+  let filtered=glog.filter(e=>{if(fc&&e.cat!==fc)return false;if(fs&&!e.msg.toLowerCase().includes(fs))return false;return true;});
+  let h='<div class="ssec"><div class="stitle"><i class="ti ti-history"></i> Application history log <span style="font-size:10px;font-weight:400;color:var(--tx3)">— '+glog.length+' entries total</span></div>';
+  h+='<div style="display:flex;gap:7px;margin-bottom:10px;flex-wrap:wrap;align-items:center">';
+  h+='<input class="sinp2" placeholder="Search log..." value="'+(ui.histSrch||'')+'" oninput="ui.histSrch=this.value;renderApp()" style="flex:1;min-width:150px">';
+  h+='<select class="ssel2" onchange="ui.histCat=this.value;renderApp()"><option value="">All</option>';
+  Object.entries(cats).forEach(([k,v])=>{h+='<option value="'+k+'" '+(fc===k?'selected':'')+'>'+v+'</option>';});
+  h+='</select>';
+    h+='<button class="btn btn-xs btn-ghost" onclick="clearGLog()"><i class="ti ti-trash"></i> Clear all</button>';
+  h+='</div>';
+  if(!filtered.length){h+='<div class="empty" style="padding:1rem"><span class="empty-icon" style="font-size:24px"><i class="ti ti-history"></i></span>'+(glog.length===0?'No history yet. Changes will appear here as you work.':'No results.')+'</div></div>';return h;}
+  h+='<div style="display:flex;flex-direction:column;gap:3px;max-height:520px;overflow-y:auto">';
+  filtered.forEach(e=>{
+    const col=catColors[e.cat]||'var(--tx4)';
+    const d=new Date(e.ts);
+    const ds=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const ts=d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    h+='<div style="display:flex;gap:8px;padding:5px 8px;background:var(--bg2);border-radius:5px;border:1px solid var(--brd);font-size:11px;align-items:flex-start">';
+    h+='<span style="color:var(--tx4);white-space:nowrap;flex-shrink:0;min-width:148px;font-size:10px">'+ds+' '+ts+'</span>';
+    h+='<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:'+col+';flex-shrink:0;min-width:52px;padding-top:1px">'+(cats[e.cat]||e.cat)+'</span>';
+    h+='<span style="color:var(--tx2);line-height:1.5;word-break:break-word">'+e.msg+'</span>';
+    h+='</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+function renderHelp(){
+  if(!tmpl.helpSections)tmpl.helpSections=getDefaultHelp();
+  let h='<div class="ssec"><div class="stitle"><i class="ti ti-help-circle"></i> Help & User Manual <span style="font-size:10px;font-weight:400;color:var(--tx3)">— editable, add or remove sections as needed</span></div>';
+  h+='<div style="font-size:11px;color:var(--tx3);margin-bottom:10px">Click any title or content to edit. Use <strong>Add section</strong> to create new ones. Changes are saved automatically.</div>';
+  h+='<div style="display:flex;gap:7px;margin-bottom:12px"><button class="btn btn-blue btn-sm" onclick="addHelpSection()"><i class="ti ti-plus"></i> Add section</button><button class="btn btn-sm" onclick="resetHelp()"><i class="ti ti-refresh"></i> Reset to defaults</button></div>';
+  tmpl.helpSections.forEach((sec,si)=>{
+    h+='<div style="border:1px solid var(--brd);border-radius:var(--r2);margin-bottom:10px;overflow:hidden">';
+    h+='<div style="background:var(--bg2);padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--brd)">';
+    h+='<input style="flex:1;font-size:12px;font-weight:600;color:var(--tx);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none" value="'+sec.title.replace(/"/g,'&quot;')+'" data-si="'+si+'" onchange="updHelpTitle(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'">';
+    h+='<button class="btn btn-xs btn-red" onclick="rmHelpSection('+si+')"><i class="ti ti-trash"></i></button>';
+    h+='</div>';
+    h+='<div style="padding:10px 12px">';
+    sec.items.forEach((item,ii)=>{
+      h+='<div style="display:flex;gap:7px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--brd)">';
+      h+='<div style="flex:1">';
+      h+='<input style="width:100%;font-size:11px;font-weight:600;color:var(--tx2);background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;margin-bottom:3px" value="'+item.q.replace(/"/g,'&quot;')+'" data-si="'+si+'" data-ii="'+ii+'" data-f="q" onchange="updHelpItem(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'" placeholder="Question / heading">';
+      h+='<textarea style="width:100%;font-size:11px;color:var(--tx2);background:var(--bg3);border:1px solid var(--brd);border-radius:5px;padding:4px 7px;resize:vertical;min-height:40px;outline:none" data-si="'+si+'" data-ii="'+ii+'" data-f="a" onchange="updHelpItem(this)" onfocus="this.style.borderColor=\'var(--blue3)\'" onblur="this.style.borderColor=\'var(--brd)\'">'+sec.items[ii].a+'</textarea>';
+      h+='</div>';
+      h+='<button class="ico-btn btn-red" onclick="rmHelpItem('+si+','+ii+')" title="Remove"><i class="ti ti-x" style="font-size:11px"></i></button>';
+      h+='</div>';
+    });
+    h+='<button class="add-btn" onclick="addHelpItem('+si+')" style="margin-top:6px"><i class="ti ti-plus" style="font-size:11px"></i> Add item</button>';
+    h+='</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+function getDefaultHelp(){return[
+  {title:'Overview',items:[
+    {q:'What is this tracker?',a:'The Hotwire Circuit Delivery Tracker manages circuits from order through turn-up across 7 phases: Order, OSP, Cab/Site, Rack & Stack, Carrier TTU, LOA/XC, HWC TTU. Dark fiber circuits skip LOA & XC automatically.'},
+    {q:'What is the circuit flow?',a:'In Queue (future circuits) -> In Flight (active) -> Completed (live & done) -> Archive (long-term storage). Circuits can also be deleted and recovered within 30 days.'},
+    {q:'What is CAD vs Expected (ECD)?',a:'CAD (Circuit Activation Date) is your internal hard deadline. Expected date (formerly ECD) is set per phase in the checklist. If ECD is within the configured days of CAD the circuit is flagged At Risk. You can rename the Expected label in Settings > Display.'}
+  ]},
+  {title:'Creating & managing circuits',items:[
+    {q:'How do I create a circuit?',a:'Click New circuit in the top right. If you are on the In Queue tab the circuit goes to queue. If on In Flight it goes directly to in-flight. Name is required.'},
+    {q:'How do I move a circuit from Queue to In Flight?',a:'Go to the In Queue tab, find the circuit, and click Move to In Flight. It will be activated and added to the In Flight list.'},
+    {q:'How do I advance a phase?',a:'Open the circuit, navigate to any phase tab, and click Mark complete at the bottom. Phases are independent - you can complete them in any order. The progress bar updates immediately.'},
+    {q:'How do I undo a phase completion?',a:'Click Mark incomplete next to the Mark complete button. This only resets that specific phase.'},
+    {q:'What is the Expected date field?',a:'Each phase has an Expected date input at the top of its checklist. You can enter a date, a quarter (Q3 2026), or any text phrase. A small calendar icon lets you pick from a date picker. The label can be renamed in Settings > Display.'},
+    {q:'What does the Status strip on cards show?',a:'Below the circuit details, a Status row shows each pending phase name and its Expected date or condition at a glance without opening the circuit. Amber = date set, blue = condition only, gray = nothing set yet.'}
+  ]},
+  {title:'Priority and status',items:[
+    {q:'How does the priority button work?',a:'Click the green Normal button to cycle through 3 states: Normal (green) -> Warning (yellow) -> Urgent (red). Each click asks for confirmation. Priority is shown on the card and affects the Urgent/Warning metric count.'},
+    {q:'What is At Risk?',a:'A circuit is At Risk when its current phase Expected date is within the configured number of days of the CAD. Default is 30 days. You can change this in Settings > Alerts. Click the At Risk metric box to filter the list to only at-risk circuits.'}
+  ]},
+  {title:'Archive, Completed, and Queue',items:[
+    {q:'What is In Queue?',a:'A holding area for future circuits not yet started. Add circuits here when planning ahead. Move them to In Flight when work begins. Queue circuits appear in backups.'},
+    {q:'When does a circuit get Completed?',a:'When you click Mark live & completed on the final HWC TTU phase and confirm all required items. The circuit moves to the Completed tab, not Archive.'},
+    {q:'What is the Completed tab?',a:'A visibility layer for recently completed circuits. Everyone can see what just got done. From here you can move to Archive manually when ready, return to In Flight if needed, or delete.'},
+    {q:'How do I move a completed circuit to Archive?',a:'Go to the Completed tab, expand the circuit, and click Move to Archive. This is a deliberate manual step.'},
+    {q:'Can I bring an archived circuit back?',a:'Yes. Archive tab > expand circuit > Return to In Flight. All data is preserved.'}
+  ]},
+  {title:'Progress bar and percentages',items:[
+    {q:'How is the percentage calculated?',a:'The percentage is based on phases completed divided by total visible phases. Each phase counts equally. Completing individual checklist items does not affect the percentage - only marking the full phase complete does.'},
+    {q:'What are the tick marks on the progress bar?',a:'The bar has tick marks at every 10% and labels at 20%, 40%, 60%, 80% so you can see progress precisely at a glance.'},
+    {q:'Can I group circuits by percentage?',a:'Yes. Use the Group dropdown and select Group: % Progress. Circuits are bucketed into 0-24%, 25-49%, 50-74%, 75-99%, and 100% Done.'}
+  ]},
+  {title:'Dividers',items:[
+    {q:'What are dividers?',a:'Blue separator bars you can insert between circuits to create visual groups or categories. Click Add divider in the toolbar.'},
+    {q:'How do I manage dividers?',a:'Drag the grip handle to move a divider up or down. Check the checkbox on a divider then click Delete divider in the toolbar to remove it. Circuits under a divider are not deleted.'}
+  ]},
+  {title:'Settings - overview',items:[
+    {q:'How do unsaved settings work?',a:'When you change any setting an orange Unsaved changes banner appears at the top of the Settings panel. Changes are held in memory (you can preview them) but NOT saved to storage until you click Save settings. Click Discard to revert all pending changes.'},
+    {q:'What does Save all settings do?',a:'Saves all settings (template, display, colors, alerts, word doc, phase names, data sources, help manual) to browser storage in one click. A green checkmark and timestamp confirm the save.'},
+    {q:'How do I back up settings separately from circuit data?',a:'Click Backup settings in the header or Settings > Data mgmt > Settings backup. This saves ONLY settings to a JSON file (no circuit data). You can name the backup and it gets a date-time stamp.'},
+    {q:'How do I restore settings from a backup?',a:'Click Restore settings in the header or Settings > Data mgmt > Restore settings. Select the settings JSON file. Your template, colors, alerts, and all preferences are restored. Circuit data is not affected.'}
+  ]},
+  {title:'Settings - template',items:[
+    {q:'How do I edit checklist items for new circuits?',a:'Settings > Template. Each phase shows its checklist items. Edit inline, add new items, or remove items with the X button (confirmation required). Click Save & apply to all circuits to push changes to existing circuits.'},
+    {q:'How do I reset a phase to its original checklist?',a:'Each phase has a Reset phase button next to its label. Click it to restore just that phase to factory defaults. You can also click Reset all defaults at the top to restore every phase at once.'}
+  ]},
+  {title:'Settings - display & colors',items:[
+    {q:'What can I customize in Display settings?',a:'Tracker name, company name, engineer chip label (e.g. TE or Assigned to), ECD/Expected label, status column title, base font size, default sort and group, capacity warning threshold, and 6 color pickers (card name background, engineer chip, normal/warning/urgent colors, urgent border). All have Default reset buttons.'},
+    {q:'When do color changes take effect?',a:'Color changes preview immediately so you can see them. However they are NOT saved to storage until you click Save settings. If you discard, colors revert.'}
+  ]},
+  {title:'Settings - alerts',items:[
+    {q:'What alerts can I configure?',a:'At risk (days before CAD), Urgent (manual flag), SFP order needed (days before rack ECD), Capacity warning (circuit count). Each can be toggled on/off, renamed, have its threshold changed, and be shown or hidden from the metric boxes.'},
+    {q:'How do I add a custom alert?',a:'Settings > Alerts > Add alert rule. Enter a name, description, color, and days threshold. Check Show in metric box to display it on the dashboard.'}
+  ]},
+  {title:'History log',items:[
+    {q:'What does the History log record?',a:'Every circuit change (field updates, checklist items checked, phases completed), every settings change (before and after values), admin actions, and app load events. Keeps the last 500 entries.'},
+    {q:'Can I filter the history?',a:'Yes. Filter by category (Circuit, Settings, Admin, System) or search by keyword. Clear all removes all entries after confirmation.'},
+    {q:'Is history included in backups?',a:'Yes. The full backup (Backup button) includes the history log. Settings-only backups do not include history.'}
+  ]},
+  {title:'Backup and data protection',items:[
+    {q:'IMPORTANT: Where is data stored?',a:'All data is stored in your browser local storage only. If you clear browser data, everything is lost. Back up regularly using the Backup button in the header.'},
+    {q:'How do I back up circuit data?',a:'Click Backup in the top header. Enter an optional name. A JSON file downloads with all circuits (in-flight, queue, completed, archive, deleted), settings, and history. Date and time are auto-added to the filename.'},
+    {q:'How do I restore from a circuit backup?',a:'Click Restore in the header. Select your JSON backup file. The restore MERGES the backup - existing circuits are preserved and only new ones (by ID) are added. Nothing is overwritten.'},
+    {q:'How often should I back up?',a:'After adding new circuits, after major milestones, and at the end of each week. Store backups in a shared drive so they are accessible if your computer changes.'},
+    {q:'What is the difference between Backup and Backup settings?',a:'Backup saves everything: circuits, queue, completed, archive, deleted, history, and settings. Backup settings saves ONLY the configuration (template, colors, alerts, display, word doc) with no circuit data.'}
+  ]},
+  {title:'Exporting reports',items:[
+    {q:'How do I export a Word document?',a:'Click Export in the header. Select circuits to include. Click Word. A .doc file downloads.'},
+    {q:'What does the Word export include?',a:'Status badge, phase progress, next pending action, key dates (CAD, Expected), circuit details, team contacts, technical fields, and any custom sections you added in Settings > Word doc.'},
+    {q:'How do I add custom content to the Word doc?',a:'Settings > Word doc > Add custom section. Enter a title and content. These sections appear at the end of every exported circuit report.'},
+    {q:'How do I export a PDF?',a:'Export dialog > PDF. Opens your browser print dialog. Choose Save as PDF.'}
+  ]}
+];}
+window.addHelpSection=()=>{if(!tmpl.helpSections)tmpl.helpSections=getDefaultHelp();tmpl.helpSections.push({title:'New section',items:[{q:'Question',a:'Answer'}]});ui.settingsDirty=true;renderApp();};
+window.rmHelpSection=si=>{if(!tmpl.helpSections)return;const sec=tmpl.helpSections[si];if(!confirm('Remove manual section "'+sec.title+'"?'))return;tmpl.helpSections.splice(si,1);sv(TK,tmpl);renderApp();};
+window.addHelpItem=si=>{if(!tmpl.helpSections)return;tmpl.helpSections[si].items.push({q:'Question',a:'Answer'});ui.settingsDirty=true;renderApp();};
+window.rmHelpItem=(si,ii)=>{if(!tmpl.helpSections)return;const item=tmpl.helpSections[si].items[ii];if(!confirm('Remove item "'+item.q+'"?'))return;tmpl.helpSections[si].items.splice(ii,1);sv(TK,tmpl);renderApp();};
+window.updHelpTitle=el=>{if(!tmpl.helpSections)return;tmpl.helpSections[+el.dataset.si].title=el.value;ui.settingsDirty=true;};
+window.updHelpItem=el=>{if(!tmpl.helpSections)return;tmpl.helpSections[+el.dataset.si].items[+el.dataset.ii][el.dataset.f]=el.value;ui.settingsDirty=true;};
+window.resetHelp=()=>{if(!confirm('Reset manual to defaults? Your edits will be lost.'))return;tmpl.helpSections=getDefaultHelp();sv(TK,tmpl);renderApp();};
+function renderSettings(){
+  const st=ui.stab||'template';
+  const tabs=[{k:'template',icon:'ti-list-check',label:'Template'},{k:'phases',icon:'ti-git-branch',label:'Phases'},{k:'word',icon:'ti-file-word',label:'Word doc'},{k:'display',icon:'ti-layout',label:'Display'},{k:'alerts',icon:'ti-bell',label:'Alerts'},{k:'sources',icon:'ti-database',label:'Data sources'},{k:'data',icon:'ti-database-export',label:'Data mgmt'},{k:'history',icon:'ti-history',label:'History'},{k:'reference',icon:'ti-book',label:'Reference'},{k:'help',icon:'ti-help-circle',label:'Help / Manual'},{k:'admin',icon:'ti-shield-lock',label:'Admin'}];
+  let nav='<div class="snav">';
+  tabs.forEach(t=>{nav+='<button class="stab '+(st===t.k?'on':'')+'" onclick="setSTab(\''+t.k+'\')"><i class="ti '+t.icon+'"></i> '+t.label+'</button>';});
+  nav+='</div>';
+  let body='<div class="sbody">';
+  const _sts=fo('hwct9_stssave');
+  const _stsLabel=_sts.ts?'Last saved: '+fTs(_sts.ts):'Not saved this session';
+  if(ui.settingsDirty){
+    body+='<div style="background:var(--amb2);border:1px solid var(--amb3);border-radius:var(--r);padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div style="display:flex;align-items:center;gap:7px;color:var(--amb3);font-size:12px;font-weight:600"><i class="ti ti-alert-triangle"></i> You have unsaved changes</div><div style="display:flex;gap:6px"><button class="btn btn-xs btn-ghost" onclick="discardSettings()"><i class="ti ti-x"></i> Discard</button><button class="btn btn-sm btn-green" onclick="saveAllSettings()"><i class="ti ti-device-floppy"></i> Save settings</button></div></div>';
+  } else {
+    body+='<div style="font-size:10px;color:var(--tx4);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-circle-check" style="color:var(--green3)"></i> '+_stsLabel+'</span><div style="display:flex;gap:5px"><button class="btn btn-xs btn-green" onclick="saveAllSettings()"><i class="ti ti-device-floppy"></i> Save all settings</button><button class="btn btn-xs btn-amb" onclick="openSBk()"><i class="ti ti-settings-2"></i> Backup</button><button class="btn btn-xs" onclick="openSRst()"><i class="ti ti-settings-restore"></i> Restore</button></div></div>';
+  }
+  if(st!=='admin'&&isSettingsLocked()){
+    const lockHtml='<div class="ssec"><div class="stitle"><i class="ti ti-lock"></i> Settings locked</div>'+'<div style="font-size:12px;color:var(--tx3);margin-bottom:12px">An admin password is set. Go to the Admin tab and enter the password to unlock settings.</div>'+'<button class="btn btn-blue btn-sm" onclick="setSTab(String.fromCharCode(97,100,109,105,110))"><i class="ti ti-shield-lock"></i> Go to Admin</button></div>';
+    body+=lockHtml+'</div>';
+    return '<div class="sw">'+nav+body;
+  }
+  if(st==='template'){
+    body+='<div class="ssec"><div class="stitle"><i class="ti ti-list-check"></i> Checklist template &mdash; applied to all new circuits<button class="btn btn-xs btn-ghost" style="margin-left:auto" onclick="resetAllTmpl()" title="Reset ALL phases to factory defaults"><i class="ti ti-refresh"></i> Reset all defaults</button></div>';
+    ALL_PH.forEach(ph=>{
+      const items=tmpl.cl[ph.key]||[];
+      body+='<div style="margin-bottom:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">'+ph.label+'</div><button class="btn btn-xs btn-ghost" onclick="resetPhTmpl(\''+ph.key+'\')" title="Restore this phase to default checklist items"><i class="ti ti-refresh"></i> Reset phase</button></div>';
+      items.forEach((item,i)=>{
+        body+='<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid var(--brd)"><input style="flex:1;font-size:11px;border:none;background:transparent;color:var(--tx2);outline:none;border-bottom:1px dashed transparent" value="'+item.replace(/"/g,'&quot;')+'" data-phkey="'+ph.key+'" data-idx="'+i+'" onchange="updTI(this)" onfocus="this.style.borderBottomColor=\'var(--blue3)\'" onblur="this.style.borderBottomColor=\'transparent\'"><button class="ico-btn" onclick="rmTI(\''+ph.key+'\','+i+')"><i class="ti ti-x" style="font-size:10px"></i></button></div>';
+      });
+      body+='<div style="display:flex;gap:5px;margin-top:5px"><input id="nti-'+ph.key+'" class="tag-inp" placeholder="New item..." style="font-size:11px"><button class="btn btn-xs btn-blue" onclick="addTI(\''+ph.key+'\')"><i class="ti ti-plus"></i> Add</button></div></div>';
+    });
+    body+='<div style="margin-top:10px"><button class="btn btn-green" onclick="saveTmpl()"><i class="ti ti-device-floppy"></i> Save &amp; apply to all circuits</button></div></div>';
+  } else if(st==='phases'){
+    body+='<div class="ssec"><div class="stitle"><i class="ti ti-git-branch"></i> Phases &mdash; rename, reorder, add or remove</div>';
+    body+='<div style="font-size:11px;color:var(--tx3);margin-bottom:9px">Changes apply to all circuits when you save. Removing a phase deletes its checklist data from all circuits.</div>';
+    const custPh=tmpl.customPhases||ALL_PH.map(p=>({key:p.key,label:tmpl.phLabels[p.key]||p.label,isDefault:true}));
+    custPh.forEach((ph,pi)=>{
+      body+='<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid var(--brd)">';
+      body+='<i class="ti ti-grip-vertical" style="color:var(--tx4);font-size:13px;cursor:grab" title="Drag to reorder"></i>';
+      body+='<input style="flex:1;font-size:12px;border:1px solid var(--brd);border-radius:6px;padding:5px 8px;background:var(--bg2);color:var(--tx2)" value="'+ph.label.replace(/"/g,'&quot;')+'" data-phidx="'+pi+'" onchange="updCustPh(this)" placeholder="Phase name">';
+      if(!ph.isDefault){
+        body+='<button class="btn btn-xs btn-red" onclick="rmCustPh('+pi+')"><i class="ti ti-trash"></i> Remove</button>';
+      } else {
+        body+='<span style="font-size:10px;color:var(--tx4);padding:2px 6px">Default</span>';
+      }
+      body+='</div>';
+    });
+    body+='<div style="display:flex;gap:6px;margin-top:10px"><input id="new-ph-name" class="sinp2" placeholder="New phase name..." style="flex:1"><input id="new-ph-key" class="sinp2" placeholder="Key (no spaces, e.g. custom_1)" style="width:160px"><button class="btn btn-blue btn-sm" onclick="addCustPh()"><i class="ti ti-plus"></i> Add phase</button></div>';
+    body+='<div style="margin-top:10px;display:flex;gap:6px"><button class="btn btn-green" onclick="saveCustPhases()"><i class="ti ti-device-floppy"></i> Save &amp; apply to all circuits</button><button class="btn btn-ghost btn-sm" onclick="resetPhases()"><i class="ti ti-refresh"></i> Reset to defaults</button></div></div>';
+  } else if(st==='word'){
+    const ws=tmpl.wordSettings||{};
+    const tog=(k,v,lbl,sub)=>'<div class="srow"><div><div class="slbl">'+lbl+'</div>'+(sub?'<div class="ssub">'+sub+'</div>':'')+'</div><button class="stog '+(v?'on':'off')+'" onclick="togWS(\''+k+'\')"></button></div>';
+    body+='<div class="ssec"><div class="stitle" style="display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-file-word"></i> Word document settings</span><button class="btn btn-xs btn-ghost" onclick="resetWordSettings()" title="Reset Word doc settings to defaults"><i class="ti ti-refresh"></i> Reset defaults</button></div>';
+    body+='<div class="srow"><div class="slbl">Company name</div><input class="sinp2" value="'+(ws.companyName||'Hotwire Communications').replace(/"/g,'&quot;')+'" onchange="updWS(\'companyName\',this.value)"></div>';
+    body+='<div class="srow"><div class="slbl">Accent color</div><input class="sinp2" type="color" value="'+(ws.accentColor||'#1B3F6E')+'" onchange="updWS(\'accentColor\',this.value)" style="width:60px;padding:2px"></div>';
+    body+=tog('showStatus',ws.showStatus!==false,'Show status badge','Urgent / At risk / On order / In progress');
+    body+=tog('showPhase',ws.showPhase!==false,'Show current phase & progress','');
+    body+=tog('showDates',ws.showDates!==false,'Show CAD, ECD, key dates','');
+    body+=tog('showTeam',ws.showTeam!==false,'Show engineers & PM contacts','');
+    body+=tog('showTechnical',ws.showTechnical!==false,'Show technical fields (colo, SFP, router port, VLAN)','');
+    body+=tog('showContacts',ws.showContacts!==false,'Show contact phone & email','');
+    body+=tog('showNotes',ws.showNotes===true,'Include phase notes in export','Excluded by default');
+    body+='<div style="height:1px;background:var(--brd);margin:10px 0"></div>';
+    body+='<div style="font-size:11px;font-weight:600;color:var(--tx);margin-bottom:8px">Custom sections in Word export</div>';
+    body+='<div style="font-size:11px;color:var(--tx3);margin-bottom:8px">Add extra labeled sections with custom content to the Word doc.</div>';
+    const custSecs=tmpl.wordSettings?.customSections||[];
+    custSecs.forEach((sec,ci)=>{
+      body+='<div style="border:1px solid var(--brd);border-radius:var(--r);padding:10px;margin-bottom:8px">';
+      body+='<div style="display:flex;gap:7px;align-items:center;margin-bottom:6px">';
+      body+='<input style="flex:1;font-size:12px;font-weight:600;border:1px solid var(--brd);border-radius:5px;padding:4px 8px;background:var(--bg2);color:var(--tx2)" value="'+sec.title.replace(/"/g,'&quot;')+'" data-ci="'+ci+'" onchange="updWordSec(this,\'title\')" placeholder="Section title">';
+      body+='<button class="ico-btn btn-red" onclick="rmWordSec('+ci+')" title="Remove"><i class="ti ti-x" style="font-size:11px"></i></button>';
+      body+='</div>';
+      body+='<textarea style="width:100%;font-size:11px;background:var(--bg2);border:1px solid var(--brd);border-radius:5px;padding:5px 8px;color:var(--tx2);resize:vertical;min-height:50px" data-ci="'+ci+'" onchange="updWordSec(this,\'content\')" placeholder="Content for this section...">'+sec.content+'</textarea>';
+      body+='</div>';
+    });
+    body+='<button class="add-btn" onclick="addWordSec()"><i class="ti ti-plus" style="font-size:11px"></i> Add custom section</button>';
+    body+='<div style="margin-top:10px"><button class="btn btn-green" onclick="saveTmpl()"><i class="ti ti-device-floppy"></i> Save</button></div></div>';
+  } else if(st==='display'){
+    const ds=tmpl.displaySettings||{};
+    body+='<div class="ssec"><div class="stitle" style="display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-layout"></i> Display preferences</span><button class="btn btn-xs btn-ghost" onclick="resetDisplaySettings()" title="Reset display settings to defaults"><i class="ti ti-refresh"></i> Reset all</button></div>';
+    // Theme row with visual buttons
+    body+='<div class="srow"><div><div class="slbl">App theme</div><div class="ssub">Choose dark or light mode. Saved with settings.</div></div>';
+    body+='<div style="display:flex;gap:7px;align-items:center">';
+    body+='<button onclick="setThemePref(\'dark\')" class="btn btn-sm '+(prefs.theme==='dark'?'btn-blue':'')+'" style="'+(prefs.theme==='dark'?'':'opacity:.5')+'" title="Dark mode">&#127769; Dark</button>';
+    body+='<button onclick="setThemePref(\'light\')" class="btn btn-sm '+(prefs.theme==='light'?'btn-blue':'')+'" style="'+(prefs.theme==='light'?'':'opacity:.5')+'" title="Light mode">&#9728;&#65039; Light</button>';
+    body+='</div></div>';
+    body+='<div class="srow"><div><div class="slbl">Multi-open mode</div><div class="ssub">Keep multiple circuits expanded at once. Useful for printing all status at once.</div></div><div style="display:flex;align-items:center;gap:9px"><button class="stog '+(ui.multiOpen?'on':'off')+'" onclick="togMultiOpenSetting()"></button><span style="font-size:11px;color:var(--tx3)">'+(ui.multiOpen?'ON — multiple circuits stay open':'OFF — opening one closes the previous')+'</span></div></div>';
+    body+='<div class="srow"><div><div class="slbl">Engineer chip label</div><div class="ssub">Short label before the name on cards (e.g. TE, Eng, PM, Assigned to)</div></div><div style="display:flex;align-items:center;gap:7px"><input class="sinp2" id="inp-engLabel" value="'+(ds.engLabel||'TE')+'\'" onchange="updDS(\'engLabel\',this.value)" style="width:110px"><button class="btn btn-xs btn-ghost" onclick="updDS(\'engLabel\',\'TE\')"><i class="ti ti-refresh"></i> Default</button></div></div>';
+    body+='<div class="srow"><div><div class="slbl">Tracker name</div><div class="ssub">Shown in the header and Word document</div></div><input class="sinp2" value="'+(ds.trackerName||'Circuit Delivery Tracker').replace(/"/g,'&quot;')+'" onchange="updDS(\'trackerName\',this.value)" style="width:220px"></div>';
+    body+='<div class="srow"><div><div class="slbl">Status column title</div><div class="ssub">Title shown above the phase status column on circuit cards</div></div><div style="display:flex;align-items:center;gap:7px"><input class="sinp2" id="inp-statusLabel" value="'+(ds.statusLabel||'Status')+'\'" onchange="updDS(\'statusLabel\',this.value)" style="width:150px"><button class="btn btn-xs btn-ghost" onclick="updDS(\'statusLabel\',\'Status\')"><i class="ti ti-refresh"></i> Default</button></div></div>';
+    body+='<div class="srow"><div><div class="slbl">ECD / Expected label</div><div class="ssub">Label shown on the Expected date field in all phase checklists</div></div><div style="display:flex;align-items:center;gap:7px"><input class="sinp2" id="inp-ecdLabel" value="'+(tmpl.ecdLabel||'Expected')+'\'" onchange="updEcdLabel(this.value)" style="width:150px"><button class="btn btn-xs btn-ghost" onclick="updEcdLabel(\'Expected\')"><i class="ti ti-refresh"></i> Default</button></div></div>';
+    const colorRow=(lbl,sub,key,def)=>'<div class="srow"><div><div class="slbl">'+lbl+'</div><div class="ssub">'+sub+'</div></div><div style="display:flex;align-items:center;gap:7px"><input class="sinp2" type="color" value="'+(ds[key]||def)+'" id="clr-'+key+'" onchange="updDS(\''+key+'\',this.value)" style="width:50px;padding:2px;cursor:pointer"><button class="btn btn-xs btn-ghost" onclick="resetClr(\''+key+'\',\''+def+'\')" title="Reset to default" style="font-size:10px"><i class="ti ti-refresh"></i> Default</button></div></div>';
+    body+=colorRow('Circuit name background','Highlight behind the circuit name on cards','cardNameBg','#252E44');
+    body+=colorRow('Transport engineer chip color','Background of the engineer name badge','engChipBg','#2A1A5A');
+    body+=colorRow('Normal status color','Green pill for normal circuits','normalColor','#1A3A10');
+    body+=colorRow('Urgent status color','Red indicator for urgent circuits','urgentColor','#4A0A0A');
+    body+=colorRow('At risk / warning color','Amber for ECD near CAD alerts','warningColor','#3A2A10');
+    body+=colorRow('Urgent card border','Left border accent on urgent cards','urgentBorder','#D06060');
+    body+='<div class="srow"><div><div class="slbl">Company name</div><div class="ssub">Shown in header eyebrow and Word doc</div></div><input class="sinp2" value="'+(tmpl.wordSettings?.companyName||'Hotwire Communications').replace(/"/g,'&quot;')+'" onchange="updWS(\'companyName\',this.value)" style="width:220px"></div>';
+        const _curPx=prefs.fontSize||13;
+    body+='<div class="srow"><div><div class="slbl">Base font size</div><div class="ssub">11px–15px supported. Changes preview immediately, Save to make permanent.</div></div><div style="display:flex;align-items:center;gap:7px"><select class="ssel2" onchange="updFontSize(this.value)"><option value="11" '+(_curPx===11?'selected':'')+'>Small (11px)</option><option value="12" '+(_curPx===12?'selected':'')+'>Medium (12px)</option><option value="13" '+(_curPx===13?'selected':'')+'>Normal (13px)</option><option value="14" '+(_curPx===14?'selected':'')+'>Large (14px)</option><option value="15" '+(_curPx===15?'selected':'')+'>Extra large (15px)</option></select><button class="btn btn-xs btn-ghost" onclick="updFontSize(13)"><i class="ti ti-refresh"></i> Default</button></div></div>';
+    body+='<div class="srow"><div class="slbl">Default sort</div><select class="ssel2" onchange="updDS(\'defaultSort\',this.value)"><option value="cad" '+(ds.defaultSort==='cad'?'selected':'')+'>CAD date</option><option value="engineer" '+(ds.defaultSort==='engineer'?'selected':'')+'>Engineer</option><option value="service" '+(ds.defaultSort==='service'?'selected':'')+'>Service type</option><option value="site" '+(ds.defaultSort==='site'?'selected':'')+'>Site</option><option value="urgent" '+(ds.defaultSort==='urgent'?'selected':'')+'>Urgent first</option></select></div>';
+    body+='<div class="srow"><div class="slbl">Default group</div><select class="ssel2" onchange="updDS(\'defaultGroup\',this.value)"><option value="" '+(!ds.defaultGroup?'selected':'')+'>None</option><option value="engineer" '+(ds.defaultGroup==='engineer'?'selected':'')+'>Engineer</option><option value="service" '+(ds.defaultGroup==='service'?'selected':'')+'>Service type</option><option value="site" '+(ds.defaultGroup==='site'?'selected':'')+'>Site</option></select></div>';
+    body+='<div class="srow"><div><div class="slbl">Capacity warning threshold</div><div class="ssub">Show warning when circuits reach this number</div></div><input class="sinp2" type="number" value="'+(ds.capWarning||40)+'" style="width:80px" onchange="updDS(\'capWarning\',parseInt(this.value)||40)"></div>';
+    body+='<div style="margin-top:10px"><button class="btn btn-green" onclick="saveTmpl()"><i class="ti ti-device-floppy"></i> Save</button></div></div>';
+  } else if(st==='sources'){
+    const ds=tmpl.dataSources||{};
+    function tagSec(key,title,items){
+      let s='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;margin-bottom:5px">'+title+'</div><div class="tag-list">';
+      (items||[]).forEach((v,i)=>{s+='<span class="tag">'+v+'<button class="ico-btn" style="width:14px;height:14px" onclick="rmSrc(\''+key+'\','+i+')"><i class="ti ti-x" style="font-size:9px"></i></button></span>';});
+      s+='</div><div class="tag-add"><input id="src-'+key+'" class="tag-inp" placeholder="Add new..."><button class="btn btn-xs btn-blue" onclick="addSrc(\''+key+'\')"><i class="ti ti-plus"></i> Add</button></div></div>';
+      return s;
+    }
+    body+='<div class="ssec"><div class="stitle" style="display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-database"></i> Data sources &mdash; dropdown suggestions</span><button class="btn btn-xs btn-ghost" onclick="resetDataSources()" title="Reset all data source lists to factory defaults"><i class="ti ti-refresh"></i> Reset defaults</button></div>';
+    body+=tagSec('serviceTypes','Service types',ds.serviceTypes||SVC_DEF);
+    body+=tagSec('carriers','Carriers',ds.carriers||CAR_DEF);
+    body+=tagSec('dataCenters','Data centers / Z end options',ds.dataCenters||DC_DEF);
+    body+=tagSec('capacities','Capacities',ds.capacities||CAP_DEF);
+    body+='<button class="btn btn-green" onclick="saveTmpl()"><i class="ti ti-device-floppy"></i> Save</button></div>';
+  } else if(st==='alerts'){
+    body+=renderAlertsSettings();
+  } else if(st==='admin'){
+    body+=renderAdmin();
+  } else if(st==='reference'){
+    body+=renderReference();
+  } else if(st==='history'){
+    body+=renderHistoryLog();
+  } else if(st==='help'){
+    body+=renderHelp();
+  } else if(st==='data'){
+    body+='<div class="ssec"><div class="stitle"><i class="ti ti-database-export"></i> Data management</div>';
+    body+='<div class="srow"><div><div class="slbl">Backup all circuits</div><div class="ssub">Save to JSON file</div></div><button class="btn btn-sm btn-amb" onclick="openBk()"><i class="ti ti-database-export"></i> Backup now</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Restore from backup</div><div class="ssub">Merge JSON backup</div></div><button class="btn btn-sm" onclick="openRst()"><i class="ti ti-database-import"></i> Restore</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Settings backup</div><div class="ssub">Save all settings (not circuit data) to a JSON file</div></div><button class="btn btn-sm btn-amb" onclick="openSBk()"><i class="ti ti-settings-2"></i> Backup settings</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Restore settings from backup</div><div class="ssub">Restore a previously saved settings file</div></div><button class="btn btn-sm" onclick="openSRst()"><i class="ti ti-settings-restore"></i> Restore settings</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Export in-flight</div><div class="ssub">Word or PDF</div></div><button class="btn btn-sm btn-pur" onclick="openExp(\'inflight\')"><i class="ti ti-file-export"></i> Export</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Export archive</div><div class="ssub">Word or PDF</div></div><button class="btn btn-sm btn-pur" onclick="openExp(\'archive\')"><i class="ti ti-file-export"></i> Export</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Reset all settings to factory defaults</div><div class="ssub">Resets template, display, word doc, alerts, phases, data sources — not circuit data</div></div><button class="btn btn-sm btn-red" onclick="resetAllSettings()"><i class="ti ti-refresh"></i> Reset all settings</button></div>';
+    body+='<div class="srow"><div><div class="slbl">Purge deleted circuits</div><div class="ssub">Permanently remove all '+deleted.length+' deleted now</div></div><button class="btn btn-sm btn-red" onclick="purgeAll()"><i class="ti ti-trash-x"></i> Purge all</button></div>';
+    body+='<div style="height:1px;background:var(--brd);margin:16px 0"></div>';
+    body+='<div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:10px"><i class="ti ti-cloud-upload"></i> Auto-backup</div>';
+    const _ab=tmpl.autoBackup||{};
+    body+='<div class="srow"><div><div class="slbl">Auto-backup on close</div><div class="ssub">Downloads a JSON backup every time you close or refresh the tab</div></div><button class="stog '+(_ab.onClose?'on':'off')+'" onclick="togAutoBackup(\'onClose\')"></button></div>';
+    body+='<div class="srow"><div><div class="slbl">Daily auto-backup</div><div class="ssub">Runs once per day on first open. Last: '+(_ab.lastAutoBackup?fTs(_ab.lastAutoBackup):'Never')+'</div></div><button class="stog '+(_ab.daily?'on':'off')+'" onclick="togAutoBackup(\'daily\')"></button></div>';
+    body+='<div style="font-size:11px;color:var(--tx3);margin-top:8px;padding:9px 11px;background:var(--blue2);border-radius:var(--r);border:1px solid var(--blue3)"><i class="ti ti-lightbulb" style="color:var(--blue3)"></i> <strong>Tip:</strong> Set your browser download folder to Google Drive, OneDrive, or Dropbox for automatic cloud sync.</div>';
+    body+='</div>';
+  }
+  body+='</div>';
+  return'<div class="sw">'+nav+body+'</div>';
+}
+
+function renderModal(){
+  const r=document.getElementById('mroot');if(!r)return;
+  if(ui.modal&&ui.mType==='new')r.innerHTML=renderNewForm();
+  else if(ui.modal&&ui.mType==='exp')r.innerHTML=renderExpM();
+  else if(ui.modal&&ui.mType==='bk')r.innerHTML=renderBkM();
+  else if(ui.modal&&ui.mType==='rst')r.innerHTML=renderRstM();
+  else if(ui.mType==='sbk')r.innerHTML=renderSBkM();
+  else if(ui.mType==='srst')r.innerHTML=renderSRstM();
+  else if(ui.confId)r.innerHTML=renderConf(ui.confId);
+  else r.innerHTML='';
+}
+
+function renderNewForm(){
+  const svc=(tmpl.dataSources?.serviceTypes||SVC_DEF).map(o=>'<option value="'+o+'">').join('');
+  const car=(tmpl.dataSources?.carriers||CAR_DEF).map(o=>'<option value="'+o+'">').join('');
+  const cap=(tmpl.dataSources?.capacities||CAP_DEF).map(o=>'<option value="'+o+'">').join('');
+  const dc=(tmpl.dataSources?.dataCenters||DC_DEF).map(o=>'<option value="'+o+'">').join('');
+  return'<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title">New circuit</div><div class="modal-sub">Name is your primary identifier. ECD tracked per phase checklist.</div><div style="margin-bottom:9px"><label class="flbl">Circuit name <span style="color:var(--red3)">*</span></label><input class="fnminp" id="nf-name" placeholder="e.g. Acme Corp -- Miami to Atlanta"></div><div class="fg2"><div class="full"><label class="flbl">Transport engineer</label><input class="finp" id="nf-eng" placeholder="Engineer name"></div><div><label class="flbl">Circuit ID</label><input class="finp" id="nf-cid" placeholder="CKT-HW-0441"></div><div><label class="flbl">Service type</label><input class="finp" id="nf-svc" list="s-svc" placeholder="ELAN, EPL, DIA..."><datalist id="s-svc">'+svc+'</datalist></div><div><label class="flbl">Carrier</label><input class="finp" id="nf-car" list="s-car" placeholder="Lumen, AT&T..."><datalist id="s-car">'+car+'</datalist></div><div><label class="flbl">Capacity</label><input class="finp" id="nf-cap" list="s-cap" placeholder="1G, 10G..."><datalist id="s-cap">'+cap+'</datalist></div><div><label class="flbl">Protection</label><input class="finp" id="nf-prot" list="s-prot" placeholder="Protected / Unprotected"><datalist id="s-prot"><option value="Protected"><option value="Unprotected"></datalist></div><div><label class="flbl">CAD</label><input class="finp" id="nf-cad" type="date"></div><div><label class="flbl">A end</label><input class="finp" id="nf-aend" placeholder="Location / POP"></div><div class="full"><label class="flbl">Z end (data center)</label><input class="finp" id="nf-zend" list="s-dc" placeholder="Select or type..."><datalist id="s-dc">'+dc+'</datalist></div></div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-blue" onclick="createC()"><i class="ti ti-plus"></i> Create</button></div></div></div>';
+}
+
+function renderConf(cid){
+  const c=circuits.find(x=>x.id===cid);if(!c)return'';
+  const allOn=CONF_ITEMS.every((_,i)=>ui.cc[i]);
+  let h='<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title"><i class="ti ti-circle-check" style="color:var(--green3);margin-right:4px"></i>Mark as live</div><div class="modal-sub"><strong>'+dn(c)+'</strong> &middot; '+(c.serviceType||'--')+' &middot; '+(c.carrier||'--')+'</div><div class="conf-items">';
+  CONF_ITEMS.forEach((t,i)=>{h+='<div class="conf-row '+(ui.cc[i]?'on':'')+'" onclick="togCC('+i+')"><div class="conf-box">'+(ui.cc[i]?'<i class="ti ti-check" style="font-size:9px;color:#C6E8B0"></i>':'')+'</div><span class="conf-text">'+t+'</span></div>';});
+  h+='</div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-green '+(allOn?'':'btn-dis')+'" onclick="archC(\''+cid+'\')"><i class="ti ti-archive"></i> Confirm &amp; archive</button></div></div></div>';
+  return h;
+}
+
+function renderExpM(){
+  const src=ui.expTgt||ui.tab;
+  const list=src==='inflight'?circuits:src==='archive'?archive:deleted;
+  let h='<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title">Export -- '+(src==='inflight'?'In flight':src==='archive'?'Archive':'Deleted')+'</div><div class="modal-sub">Select circuits, then choose Word or PDF.</div><div style="display:flex;gap:6px;margin-bottom:5px"><button class="btn btn-xs" onclick="selAllE(\''+src+'\',true)">All</button><button class="btn btn-xs" onclick="selAllE(\''+src+'\',false)">None</button></div><div class="exp-list">';
+  list.forEach(c=>{h+='<div class="exp-row '+(ui.expSel[c.id]?'on':'')+'" onclick="togES(\''+c.id+'\')"><div class="exp-chk">'+(ui.expSel[c.id]?'<i class="ti ti-check" style="font-size:9px;color:#E6F1FB"></i>':'')+'</div><span style="font-size:12px;color:var(--tx2)">'+dn(c)+'</span><span class="tbadge" style="margin-left:auto">'+(c.serviceType||'--')+'</span>'+(c.urgent?'<span class="urg-btn urg-on" style="font-size:9px">Urgent</span>':'')+'</div>';});
+  h+='</div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-amb" onclick="doWord(\''+src+'\')"><i class="ti ti-file-word"></i> Word</button><button class="btn btn-blue" onclick="doPDF()"><i class="ti ti-printer"></i> PDF</button></div></div></div>';
+  return h;
+}
+
+function renderSBkM(){
+  return '<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title"><i class="ti ti-settings-2"></i> Backup settings</div><div class="modal-sub">Saves all settings (template, display, colors, alerts, word doc, phase names) to a JSON file. Circuit data is not included.</div><div style="margin-bottom:9px"><label class="flbl">Backup name (optional)</label><input class="finp" id="sbk-name" placeholder="e.g. my-settings"></div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-amb" onclick="doSBk()"><i class="ti ti-device-floppy"></i> Save settings backup</button></div></div></div>';
+}
+function renderSRstM(){
+  return '<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title"><i class="ti ti-settings-restore"></i> Restore settings from backup</div><div class="modal-sub">Restores settings from a previously saved settings JSON file. Circuit data is not affected.</div><div style="margin-bottom:9px"><label class="flbl">Select settings JSON file</label><input type="file" accept=".json" id="srst-file" class="finp"></div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-blue" onclick="doSRst()"><i class="ti ti-settings-restore"></i> Restore settings</button></div></div></div>';
+}
+function renderBkM(){return'<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title">Backup tracker</div><div class="modal-sub">Saves all circuits to JSON. Date &amp; time auto-added to filename.</div><div style="margin-bottom:9px"><label class="flbl">Backup name (optional)</label><input class="finp" id="bk-name" placeholder="e.g. weekly-backup"></div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-amb" onclick="doBk()"><i class="ti ti-database-export"></i> Save</button></div></div></div>';}
+function renderRstM(){return'<div class="mov" onclick="if(event.target===this)closeM()"><div class="modal"><div class="modal-title">Restore from backup</div><div class="modal-sub">Merges backup into current data. Duplicates skipped by ID.</div><div style="margin-bottom:9px"><label class="flbl">Select JSON file</label><input type="file" accept=".json" id="rst-file" class="finp"></div><div class="modal-foot"><button class="btn" onclick="closeM()">Cancel</button><button class="btn btn-blue" onclick="doRst()"><i class="ti ti-database-import"></i> Restore</button></div></div></div>';}
+
+function buildWord(list,today,src){
+  const rows=list.filter(c=>ui.expSel[c.id]);
+  if(!rows.length)return null;
+  const ws=tmpl.wordSettings||{};
+  const ac=ws.accentColor||'#1B3F6E';
+  const co=ws.companyName||'Hotwire Communications';
+  const sep=(lbl,val)=>'<div style="padding:2px 0;border-bottom:1px solid #E8E8E8;font-size:9pt;line-height:1.6"><span style="color:#555;min-width:140px;display:inline-block;font-weight:500">'+lbl+'</span><span style="color:#111">'+(val||'--')+'</span></div>';
+  const hdr=(txt,col)=>'<div style="color:'+(col||ac)+';font-weight:bold;font-size:9pt;margin:7px 0 3px;border-bottom:1.5px solid '+(col||ac)+';padding-bottom:2px">'+txt+'</div>';
+  const srcLabel=src==='inflight'?'In-Flight':src==='archive'?'Archived':'Deleted';
+  const sections=rows.map((c,i)=>{
+    const st=getSt(c);
+    const badge=c.urgent?'#C0392B':st==='risk'?'#E87722':st==='order'?'#F0A500':'#2A7A2A';
+    const stLabel=c.priority===2||c.urgent?'URGENT':c.priority===1?'WARNING':st==='risk'?'AT RISK':st==='order'?'ON ORDER':'IN PROGRESS';
+    const ecdI=c.phases[c.currentPhase]?.items?.find(x=>x.isEcd);
+    const ecd=ecdI?.ecdDate?fD(ecdI.ecdDate):'--';
+    const ecdCond=ecdI?.ecdCond||'';
+    const phDone=c.phases.filter(p=>p.done).length;
+    const phTotal=visPh(c).length;
+    let content='<div style="background:'+ac+';color:#FFF;padding:6px 10px;border-radius:2px 2px 0 0;display:flex;justify-content:space-between;align-items:center"><span style="font-size:10pt;font-weight:bold">'+(i+1)+'. '+dn(c)+'</span>'+(ws.showStatus!==false?'<span style="font-size:8pt;background:'+badge+';color:#fff;padding:2px 8px;border-radius:8px">'+stLabel+'</span>':'')+'</div>';
+    content+='<div style="border:1px solid #BBBBBB;border-top:none;padding:8px 10px;border-radius:0 0 2px 2px">';
+    if(ws.showPhase!==false){content+=hdr('Status & progress',ac);content+=sep('Current phase',ALL_PH[c.currentPhase]?.label||'--');content+=sep('Phase progress',phDone+' of '+phTotal+' complete');content+=sep('Next pending',getNext(c));content+=sep('Last completed',getLast(c));}
+    if(ws.showDates!==false){content+=hdr('Key dates',ac);content+=sep('CAD',fD(c.cad));content+=sep('ECD (current phase)',ecd+(ecdCond?' -- '+ecdCond:''));content+=sep('Circuit ID',c.circuitId);content+=sep('Service type',(c.serviceType||'--')+' - '+(c.capacity||'--'));content+=sep('Carrier',c.carrier);content+=sep('Protection',c.protection);content+=sep('A end',c.aEnd);content+=sep('Z end / Site',c.zEnd);}
+    if(ws.showTeam!==false){content+=hdr('Team',ac);content+=sep('Transport engineer',c.transportEngineer);content+=sep('Hotwire engineer',c.hwEngName);}
+    if(ws.showContacts!==false){content+=sep('Carrier PM',(c.carrierPmName||'--')+(c.carrierPmPhone?' - '+c.carrierPmPhone:''));content+=sep('Hotwire PM',(c.hwPmName||'--')+(c.hwPmPhone?' - '+c.hwPmPhone:''));}
+    if(ws.showTechnical!==false){content+=hdr('Technical',ac);content+=sep('Colo / data center',c.coloLocation);content+=sep('SFP type',c.sfpType);content+=sep('Router port',c.routerPort);content+=sep('VLAN',c.vlan);content+=sep('L1 result',c.l1Result);if(c.isDark){content+=sep('MOP - Carrier TTU',c.mopCarrier);content+=sep('MOP - HWC TTU',c.mopHwc);}}
+    if(ws.showNotes){const notes=c.phases.map((ph,idx)=>ph.notes?ALL_PH[idx]?.label+': '+ph.notes:'').filter(Boolean).join(' | ');if(notes){content+=hdr('Notes',ac);content+=sep('Phase notes',notes);}}
+    (ws.customSections||[]).forEach(sec=>{if(sec.title&&sec.content){content+=hdr(sec.title,ac)+sep(sec.content,'');}});
+    content+='</div>';
+    return'<div style="margin-bottom:14px;page-break-inside:avoid">'+content+'</div>';
+  }).join('');
+  return'<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:9pt;margin:.7in .75in}h1{font-size:13pt;color:'+ac+';margin-bottom:2px}@page{margin:.7in .75in;size:letter}</style></head><body><h1>'+co+' -- '+srcLabel+' Circuit Status Report</h1><div style="font-size:8pt;color:#666;margin-bottom:10px">Generated: '+today+' | Circuits: '+rows.length+' | Urgent: '+rows.filter(c=>c.urgent).length+' | At risk: '+rows.filter(c=>getSt(c)==='risk').length+'</div>'+sections+'</body></html>';
+}
+
+// EVENT HANDLERS
+window.setTab=t=>{ui.tab=t;renderApp();};
+window.setSTab=t=>{ui.stab=t;renderApp();};
+window.toggleCard=id=>{
+  if(ui.multiOpen){
+    // Multi-open: toggle in the set, never collapse others
+    if(ui.openCards.has(id)){ui.openCards.delete(id);}
+    else{ui.openCards.add(id);const c=circuits.find(x=>x.id===id);if(c&&ui.phTab[id]===undefined)ui.phTab[id]=c.currentPhase;}
+    ui.sel=null; // don't use single-select in multi mode
+  } else {
+    // Single-open: original behavior
+    ui.openCards.clear();
+    ui.sel=ui.sel===id?null:id;
+    if(ui.sel){const c=circuits.find(x=>x.id===id);if(c&&ui.phTab[id]===undefined)ui.phTab[id]=c.currentPhase;}
+  }
+  renderApp();
+};
+window.collapseAllCards=()=>{ui.openCards.clear();ui.sel=null;renderApp();};
+window.togMultiOpenSetting=()=>{
+  ui.multiOpen=!ui.multiOpen;
+  prefs.multiOpen=ui.multiOpen;
+  if(!ui.multiOpen)ui.openCards.clear();
+  ui.settingsDirty=true;
+  renderApp();
+};
+window.togMultiOpen=()=>{
+  ui.multiOpen=!ui.multiOpen;
+  prefs.multiOpen=ui.multiOpen;
+  if(!ui.multiOpen){ui.openCards.clear();} // collapse all when switching to single
+  renderApp();
+};
+window.expandAllCards=()=>{circuits.forEach(c=>{ui.openCards.add(c.id);if(ui.phTab[c.id]===undefined)ui.phTab[c.id]=c.currentPhase;});renderApp();};
+window.setPT=(cid,idx,src)=>{if(src==='archive')ui.archPh[cid]=idx;else ui.phTab[cid]=idx;renderApp();};
+window.setIT=(cid,t)=>{ui.iTab[cid]=t;renderApp();};
+window.setAIT=(cid,t)=>{ui.archIT[cid]=t;renderApp();};
+window.togAS=id=>{ui.archSel=ui.archSel===id?null:id;if(ui.archSel){const c=archive.find(x=>x.id===id);if(c&&ui.archPh[id]===undefined)ui.archPh[id]=c.currentPhase;}renderApp();};
+window.setAS=v=>{ui.archSrch=v;renderApp();};
+window.setCS=v=>{ui.compSrch=v;renderApp();};
+window.togCS=id=>{ui.compSel=ui.compSel===id?null:id;if(ui.compSel){const c=completed.find(x=>x.id===id);if(c&&!ui.compPh[id])ui.compPh[id]=c.currentPhase;}renderApp();};
+window.setCompIT=(cid,t)=>{ui.compIT[cid]=t;renderApp();};
+window.setQS=v=>{ui.qSrch=v;renderApp();};
+window.queueToIF=id=>{
+  const c=queue.find(x=>x.id===id);if(!c)return;
+  queue=queue.filter(x=>x.id!==id);sv(QK,queue);
+  circuits.push(c);sv(SK,circuits);syncIL();
+  ui.tab='inflight';ui.sel=c.id;ui.phTab[c.id]=0;
+  showMsg(dn(c)+' moved to In Flight.');renderApp();
+};
+window.delFromQ=id=>{
+  if(!confirm('Remove from queue? This cannot be undone.'))return;
+  const c=queue.find(x=>x.id===id);
+  if(c){c.deletedAt=new Date().toISOString();c.deletedFrom='queue';deleted.unshift(c);sv(DK,deleted);}
+  queue=queue.filter(x=>x.id!==id);sv(QK,queue);renderApp();
+};
+window.setDS=v=>{ui.delSrch=v;renderApp();};
+window.setIFS=v=>{ui.ifSrch=v;ui.ifFilter='';renderApp();};
+window.filterRisk=()=>{ui.ifFilter=ui.ifFilter==='risk'?'':'risk';ui.ifSrch='';renderApp();};
+window.clearFilter=()=>{ui.ifFilter='';ui.ifSrch='';renderApp();};
+window.dismissRisk=id=>{if(!ui.dismissedRisk)ui.dismissedRisk=new Set();ui.dismissedRisk.add(id);renderApp();};
+window.setIFSToCircuit=id=>{ui.sel=id;const c=circuits.find(x=>x.id===id);if(c&&ui.phTab[id]===undefined)ui.phTab[id]=c.currentPhase;renderApp();const el=document.getElementById('cc-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});};
+window.filterUrgent=()=>{ui.ifFilter=ui.ifFilter==='urgent'?'':'urgent';ui.ifSrch='';renderApp();};
+window.setIFSort=v=>{ui.ifSort=v;renderApp();};
+window.setIFGroup=v=>{ui.ifGroup=v;renderApp();};
+window.toggleTheme=()=>{prefs.theme=prefs.theme==='dark'?'light':'dark';sv(PK,prefs);render();};
+window.setThemePref=t=>{
+  if(prefs.theme===t)return;
+  prefs.theme=t;
+  document.documentElement.className=t==='light'?'light':'';
+  ui.settingsDirty=true;
+  renderApp();
+};
+window.adjZoom=delta=>{
+  const levels=[11,12,13,14,15];
+  const cur=prefs.fontSize||13;
+  const idx=levels.indexOf(cur);
+  const newIdx=Math.max(0,Math.min(levels.length-1,(idx===-1?2:idx)+delta));
+  prefs.fontSize=levels[newIdx];
+  document.documentElement.style.setProperty('--base-font',prefs.fontSize+'px');
+  ui.settingsDirty=true;
+  renderApp();
+};
+function applyZoom(){
+  const px=prefs.fontSize||13;
+  document.documentElement.style.setProperty('--base-font',px+'px');
+}
+function applyColors(){
+  const ds=tmpl.displaySettings||{};
+  const uc=ds.urgentColor||'#4A0A0A';
+  const ub=ds.urgentBorder||'#D06060';
+  const nc=ds.normalColor||'#1A3A10';
+  const ec=ds.engChipBg||'#2A1A5A';
+  const wc=ds.warningColor||'#3A2A10';
+  const styles='.urg-on{background:'+uc+'!important;color:#FF6060!important;border-color:'+ub+'!important;}'
+    +'.urg-off{background:'+nc+'!important;color:#80C060!important;border-color:'+nc+'!important;}'
+    +'.urg-warn{background:'+(ds.warningColor||'#4A3500')+'!important;color:#FFD060!important;border-color:'+(ds.warningColor||'#8A6000')+'!important;}'
+    +'.eng-chip{background:'+ec+'!important;color:#B0B0F0!important;border-color:'+ec+'!important;}'
+    +'.ccard.urg{border-left-color:'+ub+'!important;}'
+    +'.acard.urg{border-left-color:'+ub+'!important;}'
+    +'.a-risk{background:'+wc+'!important;}'
+    +'.sp-r{background:'+uc+'!important;}';
+  const s=document.getElementById('dyn-colors');
+  if(s){s.textContent=styles;}else{const el=document.createElement('style');el.id='dyn-colors';el.textContent=styles;document.head.appendChild(el);}
+}
+window.openNew=()=>{ui.modal=true;ui.mType='new';ui.newTarget=ui.tab==='queue'?'queue':'inflight';renderModal();};
+window.openExp=src=>{ui.modal=true;ui.mType='exp';ui.expTgt=src;ui.expSel={};(src==='inflight'?circuits:src==='archive'?archive:deleted).forEach(c=>{ui.expSel[c.id]=true;});renderModal();};
+window.openBk=()=>{ui.modal=true;ui.mType='bk';renderModal();};
+window.openRst=()=>{ui.modal=true;ui.mType='rst';renderModal();};
+window.closeM=()=>{ui.modal=false;ui.mType='';ui.confId=null;renderModal();};
+window.togES=id=>{ui.expSel[id]=!ui.expSel[id];renderModal();};
+window.selAllE=(src,v)=>{(src==='inflight'?circuits:src==='archive'?archive:deleted).forEach(c=>{ui.expSel[c.id]=v;});renderModal();};
+window.togCC=i=>{ui.cc[i]=!ui.cc[i];renderModal();};
+window.togUrg=id=>{
+  const c=circuits.find(x=>x.id===id);if(!c)return;
+  const next=((c.priority||0)+1)%3;
+  const lbl=next===2?'🔴 Urgent':next===1?'🟡 Warning':'🟢 Normal';
+  if(!confirm('Set priority to '+lbl+' for "'+dn(c)+'"?'))return;
+  c.priority=next;
+  c.urgent=c.priority===2;
+  addH(c,'Priority set to '+(next===2?'Urgent':next===1?'Warning':'Normal'));
+  sv(SK,circuits);renderApp();
+};
+window.togSel=(id,e)=>{if(e)e.stopPropagation();if(ui.selCards.has(id))ui.selCards.delete(id);else ui.selCards.add(id);renderApp();};
+window.togSelGD=(gdId,e)=>{if(e)e.stopPropagation();const key='div-'+gdId;if(ui.selCards.has(key))ui.selCards.delete(key);else ui.selCards.add(key);renderApp();};
+window.bulkDelDivs=()=>{const divIds=[...ui.selCards].filter(id=>id.startsWith('div-')).map(id=>id.slice(4));if(!divIds.length)return;iList=iList.filter(x=>!(x.type==='group'&&divIds.includes(x.id)));divIds.forEach(id=>ui.selCards.delete('div-'+id));sv(LK,iList);renderApp();};
+window.clearSel=()=>{ui.selCards.clear();renderApp();};
+window.bulkDel=()=>{
+  if(!ui.selCards.size)return;
+  const divIds=new Set([...ui.selCards].filter(id=>id.startsWith('div-')).map(id=>id.slice(4)));
+  const circIds=new Set([...ui.selCards].filter(id=>!id.startsWith('div-')));
+  const total=divIds.size+circIds.size;
+  if(!confirm('Delete '+circIds.size+' circuit(s) and '+divIds.size+' divider(s)? Circuits go to deleted folder.'))return;
+  const now=new Date().toISOString();
+  circIds.forEach(id=>{const c=circuits.find(x=>x.id===id);if(!c)return;c.deletedAt=now;c.deletedFrom='inflight';addH(c,'Bulk deleted');deleted.unshift(c);});
+  circuits=circuits.filter(c=>!circIds.has(c.id));
+  iList=iList.filter(x=>!(x.type==='circuit'&&circIds.has(x.id))&&!(x.type==='group'&&divIds.has(x.id)));
+  ui.selCards.clear();sv(SK,circuits);sv(DK,deleted);sv(LK,iList);renderApp();
+};
+window.openSaveTmpl=()=>{ui.pendTmpl=true;renderApp();};
+window.discardTmpl=()=>{ui.pendTmpl=false;renderApp();};
+window.addGDiv=()=>{iList.push({type:'group',id:'g-'+Date.now(),label:'Group label'});sv(LK,iList);renderApp();};
+window.removeGD=id=>{const g=iList.find(x=>x.id===id);if(!confirm('Remove divider "'+(g?.label||'this divider')+'"?'))return;iList=iList.filter(x=>x.id!==id);sv(LK,iList);renderApp();};
+window.renameGD=(id,val)=>{const g=iList.find(x=>x.id===id);if(g)g.label=val;sv(LK,iList);};
+
+// DRAG cards
+window.cgDS=(e,cid,idx)=>{dgSrc={cid,idx};e.dataTransfer.effectAllowed='move';e.currentTarget.classList.add('dragging');e.stopPropagation();};
+window.cgDE=e=>{e.currentTarget.classList.remove('dragging');document.querySelectorAll('.dg-top,.dg-bot').forEach(el=>{el.classList.remove('dg-top','dg-bot');});};
+window.cgDO=(e,cid)=>{e.preventDefault();e.stopPropagation();document.querySelectorAll('.dg-top,.dg-bot').forEach(el=>{el.classList.remove('dg-top','dg-bot');});const el=e.currentTarget;const mid=el.getBoundingClientRect().top+el.getBoundingClientRect().height/2;el.classList.add(e.clientY<mid?'dg-top':'dg-bot');};
+window.cgDrop=(e,cid,idx)=>{
+  e.preventDefault();e.stopPropagation();gdDgSrc=null;
+  document.querySelectorAll('.dg-top,.dg-bot').forEach(el=>{el.classList.remove('dg-top','dg-bot');});
+  if(!dgSrc||dgSrc.cid===cid){dgSrc=null;return;}
+  const srcI=iList.findIndex(x=>x.type==='circuit'&&x.id===dgSrc.cid);
+  const tgtI=iList.findIndex(x=>x.type==='circuit'&&x.id===cid);
+  if(srcI<0||tgtI<0){dgSrc=null;return;}
+  const el=document.getElementById('cc-'+cid);
+  const mid=el?el.getBoundingClientRect().top+el.getBoundingClientRect().height/2:0;
+  const after=e.clientY>mid;
+  const [item]=iList.splice(srcI,1);
+  const newT=iList.findIndex(x=>x.type==='circuit'&&x.id===cid);
+  iList.splice(after?newT+1:newT,0,item);
+  sv(LK,iList);dgSrc=null;renderApp();
+};
+// Drop ON or NEAR group divider
+// Divider drag
+let gdDgSrc=null;
+window.gdDS=(e,gdId,idx)=>{gdDgSrc={gdId,idx};dgSrc=null;e.dataTransfer.effectAllowed='move';e.currentTarget.classList.add('dragging');e.stopPropagation();};
+window.gdDE=e=>{e.currentTarget.classList.remove('dragging');document.querySelectorAll('.gdiv').forEach(el=>{el.classList.remove('dg-top','dg-bot');});};
+window.gdDOv=(e,gdId,idx)=>{
+  e.preventDefault();e.stopPropagation();
+  document.querySelectorAll('.gdiv').forEach(el=>{el.classList.remove('dg-top','dg-bot');});
+  document.querySelectorAll('.ccard').forEach(el=>{el.classList.remove('dg-top','dg-bot');});
+  const el=document.getElementById('gd-'+gdId);
+  if(el){const mid=el.getBoundingClientRect().top+el.getBoundingClientRect().height/2;el.classList.add(e.clientY<mid?'dg-top':'dg-bot');}
+};
+window.gdDrop=(e,gdId,gdIdx)=>{
+  e.preventDefault();e.stopPropagation();
+  document.querySelectorAll('.gdiv').forEach(el=>{el.classList.remove('dg-top','dg-bot');});
+  document.querySelectorAll('.ccard').forEach(el=>{el.classList.remove('dg-top','dg-bot');});
+  // Divider dragging to new position
+  if(gdDgSrc&&gdDgSrc.gdId!==gdId){
+    const srcI=iList.findIndex(x=>x.type==='group'&&x.id===gdDgSrc.gdId);
+    const tgtEl=document.getElementById('gd-'+gdId);
+    const mid=tgtEl?tgtEl.getBoundingClientRect().top+tgtEl.getBoundingClientRect().height/2:0;
+    const after=e.clientY>mid;
+    if(srcI>=0){
+      const [item]=iList.splice(srcI,1);
+      const newTgt=iList.findIndex(x=>x.type==='group'&&x.id===gdId);
+      if(newTgt>=0)iList.splice(after?newTgt+1:newTgt,0,item);
+    }
+    sv(LK,iList);gdDgSrc=null;renderApp();return;
+  }
+  // Circuit dropped onto divider — place after divider
+  if(dgSrc){
+    const srcI=iList.findIndex(x=>x.type==='circuit'&&x.id===dgSrc.cid);
+    if(srcI>=0){
+      const [item]=iList.splice(srcI,1);
+      const gdI=iList.findIndex(x=>x.type==='group'&&x.id===gdId);
+      iList.splice(gdI>=0?gdI+1:iList.length,0,item);
+    }
+    sv(LK,iList);dgSrc=null;renderApp();return;
+  }
+  gdDgSrc=null;
+};
+// CI drag
+window.listDO=e=>{e.preventDefault();};
+window.listDrop=e=>{
+  e.preventDefault();
+  // If dragging a circuit and dropped on empty area, append to end
+  if(dgSrc){
+    const srcI=iList.findIndex(x=>x.type==='circuit'&&x.id===dgSrc.cid);
+    if(srcI>=0){const [item]=iList.splice(srcI,1);iList.push(item);}
+    sv(LK,iList);dgSrc=null;renderApp();
+  }
+  if(gdDgSrc){
+    const srcI=iList.findIndex(x=>x.type==='group'&&x.id===gdDgSrc.gdId);
+    if(srcI>=0){const [item]=iList.splice(srcI,1);iList.push(item);}
+    sv(LK,iList);gdDgSrc=null;renderApp();
+  }
+};
+window.ciDS=(e,cid,ph,idx,src)=>{ciDg={cid,ph,idx,src};e.dataTransfer.effectAllowed='move';};
+window.ciDO=e=>{e.preventDefault();e.currentTarget.classList.add('dg-ci');};
+window.ciDrop=(e,cid,ph,tIdx,src)=>{
+  e.preventDefault();document.querySelectorAll('.dg-ci').forEach(el=>el.classList.remove('dg-ci'));
+  if(!ciDg||ciDg.cid!==cid||ciDg.ph!==ph)return;
+  const store=getStore(src);const c=store.find(x=>x.id===cid);if(!c)return;
+  const items=c.phases[ph].items;const [item]=items.splice(ciDg.idx,1);items.splice(tIdx,0,item);
+  setStore(src,store);ciDg=null;renderApp();
+};
+
+window.createC=()=>{
+  const g=id=>document.getElementById(id)?.value?.trim()||'';
+  const name=g('nf-name');if(!name){alert('Please enter a circuit name.');return;}
+  const c=mkCircuit({name,transportEngineer:g('nf-eng'),circuitId:g('nf-cid'),serviceType:g('nf-svc'),carrier:g('nf-car'),capacity:g('nf-cap'),protection:g('nf-prot')||'Unprotected',cad:g('nf-cad'),aEnd:g('nf-aend'),zEnd:g('nf-zend')});
+  if(ui.newTarget==='queue'){
+    queue.push(c);sv(QK,queue);ui.tab='queue';
+  } else {
+    circuits.push(c);sv(SK,circuits);syncIL();ui.sel=c.id;ui.phTab[c.id]=0;
+  }
+  closeM();renderApp();
+};
+window.softDel=id=>{if(!confirm('Move to deleted? Recoverable for 30 days.'))return;const c=circuits.find(x=>x.id===id);if(!c)return;c.deletedAt=new Date().toISOString();c.deletedFrom='inflight';addH(c,'Moved to deleted');deleted.unshift(c);circuits=circuits.filter(x=>x.id!==id);iList=iList.filter(x=>x.type==='group'||x.id!==id);if(ui.sel===id)ui.sel=null;sv(SK,circuits);sv(DK,deleted);sv(LK,iList);renderApp();};
+window.softDelA=id=>{if(!confirm('Move to deleted?'))return;const c=archive.find(x=>x.id===id);if(!c)return;c.deletedAt=new Date().toISOString();addH(c,'Moved to deleted from archive');deleted.unshift(c);archive=archive.filter(x=>x.id!==id);if(ui.archSel===id)ui.archSel=null;sv(AK,archive);sv(DK,deleted);renderApp();};
+window.permDel=id=>{if(!confirm('Permanently delete?'))return;deleted=deleted.filter(x=>x.id!==id);sv(DK,deleted);renderApp();};
+window.purgeAll=()=>{if(!confirm('Permanently delete all '+deleted.length+' deleted circuits?'))return;deleted=[];sv(DK,deleted);showMsg('All deleted purged.');renderApp();};
+window.restIF=id=>{const c=deleted.find(x=>x.id===id);if(!c)return;delete c.deletedAt;delete c.deletedFrom;addH(c,'Restored to in-flight');circuits.push(c);deleted=deleted.filter(x=>x.id!==id);syncIL();sv(SK,circuits);sv(DK,deleted);ui.tab='inflight';showMsg('Restored: '+dn(c));renderApp();};
+window.restA=id=>{const c=deleted.find(x=>x.id===id);if(!c)return;delete c.deletedAt;delete c.deletedFrom;addH(c,'Restored to archive');archive.unshift(c);deleted=deleted.filter(x=>x.id!==id);sv(AK,archive);sv(DK,deleted);ui.tab='archive';showMsg('Restored to archive: '+dn(c));renderApp();};
+window.restComp=id=>{const c=deleted.find(x=>x.id===id);if(!c)return;delete c.deletedAt;delete c.deletedFrom;addH(c,'Restored to Completed');completed.unshift(c);deleted=deleted.filter(x=>x.id!==id);sv(CK,completed);sv(DK,deleted);ui.tab='completed';showMsg('Restored to Completed: '+dn(c));renderApp();};
+window.retIF=id=>{let c=archive.find(x=>x.id===id);if(!c)return;if(!confirm('Return to in-flight? Removed from archive.'))return;archive=archive.filter(x=>x.id!==id);sv(AK,archive);delete c.archivedAt;addH(c,'Returned to in-flight from archive');circuits.push(c);sv(SK,circuits);syncIL();ui.tab='inflight';ui.archSel=null;showMsg('Returned: '+dn(c));renderApp();};
+window.togCI=(cid,phIdx,idx,src)=>{src=src||'circuits';const store=getStore(src);const c=store.find(x=>x.id===cid);if(!c)return;const item=c.phases[phIdx].items[idx];item.done=!item.done;item.date=item.done?new Date().toISOString().split('T')[0]:'';addH(c,(item.done?'Checked':'Unchecked')+': '+(item.isEcd?'ECD':item.label)+' ('+ALL_PH[phIdx]?.label+')');setStore(src,store);renderApp();};
+window.setEcdFromPicker=(el,cid,ph,idx,src)=>{
+  if(!el.value)return;
+  const store=getStore(src||'circuits');
+  const c=store.find(x=>x.id===cid);if(!c)return;
+  const item=c.phases[+ph].items[+idx];
+  item.ecdDate=el.value;
+  el.value=''; // reset picker so it shows as calendar icon next time
+  addH(c,'ECD date set: '+fD(el.value)+' ('+ALL_PH[+ph]?.label+')');
+  setStore(src||'circuits',store);renderApp();
+};
+window.updIF=el=>{const {cid,ph,idx,f,src}=el.dataset;const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const item=c.phases[+ph].items[+idx];const old=item[f];item[f]=el.value;if(old!==el.value)addH(c,'ECD '+(f==='ecdDate'?'date':'condition')+': "'+el.value+'" ('+ALL_PH[+ph]?.label+')');setStore(src||'circuits',store);};
+window.renameCI=el=>{const {cid,ph,idx,src}=el.dataset;const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const item=c.phases[+ph].items[+idx];const old=item.label;item.label=el.value;if(old!==el.value){addH(c,'Renamed item: "'+old+'" to "'+el.value+'"');const k=ALL_PH[+ph]?.key;if(k&&tmpl.cl[k]){const ti=tmpl.cl[k].indexOf(old);if(ti>=0){tmpl.cl[k][ti]=el.value;ui.pendTmpl=true;}}}setStore(src||'circuits',store);if(ui.pendTmpl)renderApp();};
+window.rmCI=(cid,phIdx,idx,src)=>{src=src||'circuits';const store=getStore(src);const c=store.find(x=>x.id===cid);if(!c)return;const lbl=c.phases[phIdx].items[idx].label;if(!confirm('Remove checklist item "'+lbl+'"?'))return;c.phases[phIdx].items.splice(idx,1);addH(c,'Removed item: "'+lbl+'" ('+ALL_PH[phIdx]?.label+')');const k=ALL_PH[phIdx]?.key;if(k&&tmpl.cl[k]){const ti=tmpl.cl[k].indexOf(lbl);if(ti>=0){tmpl.cl[k].splice(ti,1);ui.pendTmpl=true;}}setStore(src,store);renderApp();};
+window.addCI=(cid,phIdx,src)=>{src=src||'circuits';const lbl=prompt('New checklist item:');if(!lbl)return;const store=getStore(src);const c=store.find(x=>x.id===cid);if(!c)return;c.phases[phIdx].items.push(mkItem(lbl));addH(c,'Added item: "'+lbl+'" ('+ALL_PH[phIdx]?.label+')');const k=ALL_PH[phIdx]?.key;if(k){if(!tmpl.cl[k])tmpl.cl[k]=[];if(!tmpl.cl[k].includes(lbl)){tmpl.cl[k].push(lbl);ui.pendTmpl=true;}}setStore(src,store);renderApp();};
+window.hNote=el=>{const {cid,ph,idx,src}=el.dataset;const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const val=el.value.trim();const item=c.phases[+ph].items[+idx];if(isUrl(val)){const lbl=prompt('Link label:',val)||val;if(!item.links)item.links=[];item.links.push({url:val,label:lbl});el.value='';item.note='';addH(c,'Added link: '+lbl);}else item.note=val;setStore(src||'circuits',store);renderApp();};
+window.hPhNote=el=>{const {cid,ph,src}=el.dataset;const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const val=el.value.trim();const phase=c.phases[+ph];if(isUrl(val)){const lbl=prompt('Link label:',val)||val;if(!phase.links)phase.links=[];phase.links.push({url:val,label:lbl});el.value='';phase.notes='';addH(c,'Added phase link: '+lbl);}else phase.notes=val;setStore(src||'circuits',store);renderApp();};
+window.rmIL=(cid,ph,idx,li,src)=>{const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const lnk=c.phases[ph].items[idx].links[li];if(!confirm('Remove link "'+(lnk.label||lnk.url)+'"?'))return;c.phases[ph].items[idx].links.splice(li,1);setStore(src||'circuits',store);renderApp();};
+window.rmPL=(cid,ph,li,src)=>{const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const lnk=c.phases[ph].links[li];if(!confirm('Remove link "'+(lnk.label||lnk.url)+'"?'))return;c.phases[ph].links.splice(li,1);setStore(src||'circuits',store);renderApp();};
+window.renamePhase=el=>{const {cid,ph,src}=el.dataset;const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const old=c.phases[+ph].label;c.phases[+ph].label=el.value;if(old!==el.value){addH(c,'Renamed phase: "'+old+'" to "'+el.value+'"');if(!tmpl.phLabels)tmpl.phLabels={};tmpl.phLabels[ALL_PH[+ph]?.key]=el.value;ui.pendTmpl=true;}setStore(src||'circuits',store);if(ui.pendTmpl)renderApp();};
+window.renameField=el=>{const {cid,flkey,src}=el.dataset;if(!tmpl.fieldLabels)tmpl.fieldLabels={};tmpl.fieldLabels[flkey]=el.value;ui.pendTmpl=true;const store=getStore(src||'circuits');store.forEach(c=>{addH(c,'Field label renamed: '+el.value);});setStore(src||'circuits',store);renderApp();};
+window.clrF=(cid,field,src)=>{const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const old=c[field];if(!old)return;if(!confirm('Clear the "'+field+'" field? Current value: "'+old+'"'))return;c[field]='';addH(c,'Cleared: '+field);setStore(src||'circuits',store);renderApp();};
+window.updF=el=>{const {cid,field,src}=el.dataset;const store=getStore(src||'circuits');const c=store.find(x=>x.id===cid);if(!c)return;const old=c[field];c[field]=el.value;if(String(old)!==String(el.value))addH(c,'Updated '+field+': "'+( old||'--')+'" to "'+(el.value||'--')+'"');if(field==='serviceType'){c.isDark=el.value.toLowerCase().includes('dark');c.phases.forEach((p,i)=>{if(ALL_PH[i]?.key==='loa_xc')p.skipped=c.isDark;});}setStore(src||'circuits',store);if(['name','circuitId','serviceType','carrier','cad','aEnd','zEnd','transportEngineer'].includes(field))renderApp();};
+window.advPh=(cid,phIdx)=>{
+  const c=circuits.find(x=>x.id===cid);if(!c)return;
+  // phIdx may be passed directly when clicking Mark complete on any phase tab
+  const pi=phIdx!==undefined?phIdx:c.currentPhase;
+  const pn=c.phases[pi]?.label||ALL_PH[pi]?.label||'Phase';
+  c.phases[pi].done=true;
+  c.phases[pi].date=new Date().toISOString().split('T')[0];
+  // Update currentPhase to the first non-done, non-skipped phase
+  let newCur=c.phases.findIndex((p,i)=>!p.done&&!p.skipped);
+  if(newCur===-1)newCur=ALL_PH.length-1;
+  c.currentPhase=newCur;
+  addH(c,'Phase completed: '+pn);
+  ui.phTab[cid]=pi;
+  sv(SK,circuits);renderApp();
+};
+window.undoP=(cid,phIdx)=>{
+  const c=circuits.find(x=>x.id===cid);if(!c)return;
+  if(!c.phases[phIdx].done)return;
+  c.phases[phIdx].done=false;c.phases[phIdx].date='';
+  // Recalculate currentPhase
+  let newCur=c.phases.findIndex((p,i)=>!p.done&&!p.skipped);
+  if(newCur===-1)newCur=ALL_PH.length-1;
+  c.currentPhase=newCur;
+  addH(c,'Phase marked incomplete: '+ALL_PH[phIdx]?.label);
+  ui.phTab[cid]=phIdx;sv(SK,circuits);renderApp();
+};
+window.startConf=cid=>{ui.confId=cid;ui.cc={};renderModal();};
+window.archC=cid=>{
+  const c=circuits.find(x=>x.id===cid);if(!c)return;
+  c.completedAt=new Date().toISOString();
+  c.phases[c.currentPhase].done=true;
+  c.phases[c.currentPhase].date=new Date().toISOString().split('T')[0];
+  addH(c,'Marked live and completed');
+  completed.unshift(c);
+  circuits=circuits.filter(x=>x.id!==cid);
+  iList=iList.filter(x=>x.type==='group'||x.id!==cid);
+  sv(SK,circuits);sv(CK,completed);sv(LK,iList);
+  ui.confId=null;ui.sel=null;ui.tab='completed';
+  closeM();renderApp();
+};
+window.compToArch=cid=>{
+  const c=completed.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('Move "'+dn(c)+'" to Archive?'))return;
+  c.archivedAt=c.completedAt||new Date().toISOString();
+  addH(c,'Moved from Completed to Archive');
+  archive.unshift(c);
+  completed=completed.filter(x=>x.id!==cid);
+  sv(AK,archive);sv(CK,completed);
+  showMsg(dn(c)+' moved to Archive.');renderApp();
+};
+window.compToIF=cid=>{
+  const c=completed.find(x=>x.id===cid);if(!c)return;
+  if(!confirm('Return "'+dn(c)+'" to In Flight?'))return;
+  delete c.completedAt;
+  addH(c,'Returned to In Flight from Completed');
+  circuits.push(c);completed=completed.filter(x=>x.id!==cid);
+  syncIL();sv(SK,circuits);sv(CK,completed);
+  ui.tab='inflight';showMsg(dn(c)+' returned to In Flight.');renderApp();
+};
+window.softDelComp=cid=>{
+  if(!confirm('Move to deleted?'))return;
+  const c=completed.find(x=>x.id===cid);if(!c)return;
+  c.deletedAt=new Date().toISOString();c.deletedFrom='completed';
+  addH(c,'Deleted from Completed');
+  deleted.unshift(c);completed=completed.filter(x=>x.id!==cid);
+  sv(DK,deleted);sv(CK,completed);renderApp();
+};
+window.doWord=src=>{const today=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});const list=src==='inflight'?circuits:src==='archive'?archive:deleted;const html=buildWord(list,today,src);if(!html){alert('No circuits selected.');return;}const blob=new Blob([html],{type:'application/vnd.ms-word;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='HWC_'+src+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,16)+'.doc';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);closeM();showMsg('Word exported.');renderApp();};
+window.doPDF=()=>{closeM();setTimeout(()=>window.print(),300);};
+window.togAutoBackup=function(key){
+  if(!tmpl.autoBackup)tmpl.autoBackup={onClose:false,daily:false,lastAutoBackup:null};
+  tmpl.autoBackup[key]=!tmpl.autoBackup[key];
+  sv(TK,tmpl);
+  setupAutoBackup();
+  showMsg('Auto-backup on '+key+' '+(tmpl.autoBackup[key]?'enabled':'disabled')+'.');
+  renderApp();
+};
+function doAutoBackup(reason){
+  var ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,16);
+  var data={version:'hwct9',exportedAt:new Date().toISOString(),circuits:circuits,archive:archive,deleted:deleted,queue:queue,completed:completed,template:tmpl,inlineList:iList};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='HWC-auto-'+reason+'-'+ts+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  if(reason==='daily'){
+    if(!tmpl.autoBackup)tmpl.autoBackup={};
+    tmpl.autoBackup.lastAutoBackup=new Date().toISOString();
+    sv(TK,tmpl);
+  }
+}
+function setupAutoBackup(){
+  window.removeEventListener('beforeunload',window._hwcAutoBackup);
+  if(tmpl.autoBackup&&tmpl.autoBackup.onClose){
+    window._hwcAutoBackup=function(){doAutoBackup('onclose');};
+    window.addEventListener('beforeunload',window._hwcAutoBackup);
+  }
+}
+function checkDailyBackup(){
+  if(!tmpl.autoBackup||!tmpl.autoBackup.daily)return;
+  var last=tmpl.autoBackup.lastAutoBackup;
+  if(!last){doAutoBackup('daily');return;}
+  if((Date.now()-new Date(last).getTime())/36e5>=24)doAutoBackup('daily');
+}
+window.doBk=()=>{const name=(document.getElementById('bk-name')?.value?.trim()||'backup').replace(/\s+/g,'-');const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,16);const data={version:'hwct9',exportedAt:new Date().toISOString(),circuits,archive,deleted,queue,completed,globalLog:glog,template:tmpl,inlineList:iList};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='HWC-'+name+'-'+ts+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);closeM();showMsg('Backup saved.');renderApp();};
+window.doRst=()=>{const file=document.getElementById('rst-file')?.files?.[0];if(!file){alert('Select a file.');return;}const r=new FileReader();r.onload=e=>{try{const d=JSON.parse(e.target.result);const ex=new Set([...circuits,...archive,...deleted].map(c=>c.id));let added=0;(d.circuits||[]).forEach(c=>{if(!ex.has(c.id)){circuits.push(c);ex.add(c.id);added++;}});(d.archive||[]).forEach(c=>{if(!ex.has(c.id)){archive.push(c);ex.add(c.id);added++;}});(d.deleted||[]).forEach(c=>{if(!ex.has(c.id)){deleted.push(c);ex.add(c.id);added++;}});
+      (d.queue||[]).forEach(c=>{if(!ex.has(c.id)){queue.push(c);ex.add(c.id);added++;}});
+      (d.completed||[]).forEach(c=>{if(!ex.has(c.id)){completed.push(c);ex.add(c.id);added++;}});if(d.template)tmpl=d.template;if(d.inlineList)iList=d.inlineList;sv(SK,circuits);sv(AK,archive);sv(DK,deleted);sv(QK,queue);sv(CK,completed);if(d.globalLog)glog=[...d.globalLog,...glog].slice(0,500);sv(GLK,glog);sv(TK,tmpl);sv(LK,iList);closeM();showMsg('Restored. '+added+' new circuits added.');renderApp();}catch(err){alert('Invalid file: '+err.message);}};r.readAsText(file);};
+window.updTI=el=>{const {phkey,idx}=el.dataset;if(!tmpl.cl[phkey])tmpl.cl[phkey]=[];tmpl.cl[phkey][+idx]=el.value;ui.settingsDirty=true;};
+window.rmTI=(k,i)=>{if(!tmpl.cl[k])return;if(!confirm('Remove template item "'+tmpl.cl[k][i]+'"?'))return;tmpl.cl[k].splice(i,1);sv(TK,tmpl);renderApp();};
+window.addTI=k=>{const el=document.getElementById('nti-'+k);if(!el||!el.value.trim())return;if(!tmpl.cl[k])tmpl.cl[k]=[];tmpl.cl[k].push(el.value.trim());el.value='';renderApp();};
+
+window.resetPhTmpl=k=>{
+  const def=defTmpl();
+  const defItems=def.cl[k];
+  if(!defItems){alert('No default found for this phase.');return;}
+  const ph=ALL_PH.find(p=>p.key===k);
+  const phLabel=tmpl.phLabels?.[k]||ph?.label||k;
+  if(!confirm('Reset "'+phLabel+'" checklist to the original default items?\n\nThis will replace current items for this phase in the template. Existing circuits are not affected until you click Save & apply.'))return;
+  tmpl.cl[k]=[...defItems];
+  sv(TK,tmpl);
+  gLog('settings','Template phase "'+phLabel+'" reset to defaults');
+  renderApp();
+};
+
+window.resetAllTmpl=()=>{
+  if(!confirm('Reset ALL phases to factory default checklist items?\n\nThis replaces every phase template. Existing circuits are not affected until you click Save & apply.'))return;
+  const def=defTmpl();
+  tmpl.cl={...def.cl};
+  sv(TK,tmpl);
+  gLog('settings','All template phases reset to factory defaults');
+  showMsg('All phases reset to defaults.');
+  renderApp();
+};
+window.updPL=el=>{if(!tmpl.phLabels)tmpl.phLabels={};tmpl.phLabels[el.dataset.phkey]=el.value;ui.settingsDirty=true;};
+window.updWS=(k,v)=>{if(!tmpl.wordSettings)tmpl.wordSettings={};const _old=tmpl.wordSettings[k];tmpl.wordSettings[k]=v;if(_old!==undefined&&String(_old)!==String(v)){ui.settingsDirty=true;gLog('settings','Word doc ['+k+']: '+String(_old)+' -> '+String(v));}renderApp();};
+window.addWordSec=()=>{if(!tmpl.wordSettings)tmpl.wordSettings={};if(!tmpl.wordSettings.customSections)tmpl.wordSettings.customSections=[];tmpl.wordSettings.customSections.push({title:'Custom section',content:''});ui.settingsDirty=true;renderApp();};
+window.rmWordSec=ci=>{if(!tmpl.wordSettings?.customSections)return;const sec=tmpl.wordSettings.customSections[ci];if(!confirm('Remove Word doc section "'+sec.title+'"?'))return;tmpl.wordSettings.customSections.splice(ci,1);sv(TK,tmpl);renderApp();};
+window.updWordSec=(el,field)=>{if(!tmpl.wordSettings?.customSections)return;tmpl.wordSettings.customSections[+el.dataset.ci][field]=el.value;ui.settingsDirty=true;};
+window.togWS=k=>{if(!tmpl.wordSettings)tmpl.wordSettings={};tmpl.wordSettings[k]=!tmpl.wordSettings[k];ui.settingsDirty=true;renderApp();};
+window.updDS=(k,v)=>{if(!tmpl.displaySettings)tmpl.displaySettings={};const _old=tmpl.displaySettings[k];tmpl.displaySettings[k]=v;if(_old!==undefined&&String(_old)!==String(v)){ui.settingsDirty=true;gLog('settings','Display ['+k+']: '+String(_old)+' -> '+String(v));}if(k==='defaultSort')ui.ifSort=v;if(k==='defaultGroup')ui.ifGroup=v;applyColors();renderApp();};
+window.discardSettings=()=>{
+  if(!confirm('Discard all unsaved settings changes? Any changes you made will be lost.'))return;
+  try{const st=JSON.parse(localStorage.getItem(TK)||'{}');if(st.cl)tmpl=st;}catch{}
+  try{const sp=JSON.parse(localStorage.getItem(PK)||'{}');if(sp.theme||sp.fontSize)prefs=sp;}catch{}
+  ui.settingsDirty=false;
+  document.documentElement.className=prefs.theme==='light'?'light':'';
+  applyColors();applyZoom();
+  gLog('settings','Unsaved settings discarded');
+  showMsg('Settings discarded.');renderApp();
+};
+window.saveAllSettings=()=>{
+  sv(TK,tmpl);
+  sv(PK,prefs);
+  sv('hwct9_stssave',{ts:new Date().toISOString()});
+  ui.settingsDirty=false;
+  gLog('settings','All settings saved manually');
+  showMsg('Settings saved.');
+  renderApp();
+};
+
+window.openSBk=()=>{ui.modal=true;ui.mType='sbk';renderModal();};
+window.openSRst=()=>{ui.modal=true;ui.mType='srst';renderModal();};
+
+window.doSBk=()=>{
+  const name=(document.getElementById('sbk-name')?.value?.trim()||'settings').replace(/\s+/g,'-');
+  const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,16);
+  const data={
+    version:'hwct9-settings',
+    exportedAt:new Date().toISOString(),
+    name:name,
+    template:tmpl,
+    prefs:prefs
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='HWC-settings-'+name+'-'+ts+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  sv('hwct9_stssave',{ts:new Date().toISOString()});
+  gLog('settings','Settings backup saved: '+name);
+  closeM();showMsg('Settings backup saved.');renderApp();
+};
+
+window.doSRst=()=>{
+  const file=document.getElementById('srst-file')?.files?.[0];
+  if(!file){alert('Select a settings backup file.');return;}
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d.version||!d.version.includes('settings')){
+        if(!confirm('This file may not be a settings backup. Apply anyway?'))return;
+      }
+      if(!confirm('Restore settings from backup "'+( d.name||'unknown')+'"?\n\nThis will overwrite your current template, display, word doc, alerts, and preference settings.\n\nCircuit data is NOT affected.'))return;
+      if(d.template){
+        // Merge carefully - preserve circuit data references
+        tmpl=d.template;
+        sv(TK,tmpl);
+      }
+      if(d.prefs){
+        prefs=d.prefs;
+        sv(PK,prefs);
+      }
+      sv('hwct9_stssave',{ts:new Date().toISOString()});
+      gLog('settings','Settings restored from backup: '+(d.name||'unknown')+' (exported '+( d.exportedAt?fTs(d.exportedAt):'unknown')+')');
+      applyColors();applyZoom();
+      closeM();showMsg('Settings restored from backup.');renderApp();
+    }catch(err){alert('Invalid settings file: '+err.message);}
+  };
+  r.readAsText(file);
+};
+
+window.clearGLog=()=>{if(!confirm('Clear all history? This cannot be undone.'))return;glog=[];sv(GLK,glog);renderApp();};
+
+window.resetWordSettings=()=>{
+  if(!confirm('Reset all Word document settings to defaults?\nThis includes company name, accent color, and all section toggles.'))return;
+  const def=defTmpl();
+  tmpl.wordSettings={...def.wordSettings};
+  // Clear custom sections too
+  if(!confirm('Also clear custom sections added to the Word doc?')){
+    // keep custom sections
+  } else {
+    tmpl.wordSettings.customSections=[];
+  }
+  sv(TK,tmpl);
+  gLog('settings','Word doc settings reset to defaults');
+  showMsg('Word doc settings reset to defaults.');
+  renderApp();
+};
+
+window.resetDisplaySettings=()=>{
+  if(!confirm('Reset all display preferences to defaults?\nThis includes tracker name, colors, font size, sort and group settings.'))return;
+  const def=defTmpl();
+  tmpl.displaySettings={...def.displaySettings};
+  // Reset color overrides
+  delete tmpl.displaySettings.cardNameBg;
+  delete tmpl.displaySettings.engChipBg;
+  delete tmpl.displaySettings.normalColor;
+  delete tmpl.displaySettings.urgentColor;
+  delete tmpl.displaySettings.warningColor;
+  delete tmpl.displaySettings.urgentBorder;
+  delete tmpl.displaySettings.engLabel;
+  delete tmpl.displaySettings.trackerName;
+  delete tmpl.displaySettings.statusLabel;
+  delete tmpl.ecdLabel;
+  sv(TK,tmpl);
+  ui.ifSort=def.displaySettings.defaultSort||'cad';
+  ui.ifGroup=def.displaySettings.defaultGroup||'';
+  applyColors();
+  gLog('settings','Display settings reset to defaults');
+  showMsg('Display settings reset to defaults.');
+  renderApp();
+};
+
+window.resetDataSources=()=>{
+  if(!confirm('Reset all data source lists to factory defaults?\nService types, carriers, data centers, and capacities will be restored.'))return;
+  tmpl.dataSources={serviceTypes:[...SVC_DEF],carriers:[...CAR_DEF],dataCenters:[...DC_DEF],capacities:[...CAP_DEF]};
+  sv(TK,tmpl);
+  gLog('settings','Data sources reset to factory defaults');
+  showMsg('Data sources reset to defaults.');
+  renderApp();
+};
+window.updEcdLabel=v=>{tmpl.ecdLabel=v||'Expected';sv(TK,tmpl);renderApp();};
+window.resetClr=(key,def)=>{ui.settingsDirty=true;
+  if(!tmpl.displaySettings)tmpl.displaySettings={};
+  tmpl.displaySettings[key]=def;
+  sv(TK,tmpl);
+  const el=document.getElementById('clr-'+key);
+  if(el)el.value=def;
+  applyColors();renderApp();
+};
+window.updFontSize=v=>{
+  const px=Math.min(15,Math.max(11,parseInt(v)||13));
+  prefs.fontSize=px;
+  document.documentElement.style.setProperty('--base-font',px+'px');
+  ui.settingsDirty=true;
+  renderApp();
+};
+window.addSrc=key=>{const el=document.getElementById('src-'+key);if(!el||!el.value.trim())return;if(!tmpl.dataSources)tmpl.dataSources={};if(!tmpl.dataSources[key])tmpl.dataSources[key]=[];tmpl.dataSources[key].push(el.value.trim());el.value='';ui.settingsDirty=true;renderApp();};
+window.rmSrc=(key,i)=>{if(!tmpl.dataSources?.[key])return;const val=tmpl.dataSources[key][i];if(!confirm('Remove "'+val+'" from the list?'))return;tmpl.dataSources[key].splice(i,1);ui.settingsDirty=true;renderApp();};
+window.updCustPh=el=>{const i=+el.dataset.phidx;if(!tmpl.customPhases)tmpl.customPhases=ALL_PH.map(p=>({key:p.key,label:tmpl.phLabels[p.key]||p.label,isDefault:true}));tmpl.customPhases[i].label=el.value;ui.settingsDirty=true;};
+window.rmCustPh=i=>{if(!tmpl.customPhases)return;const ph=tmpl.customPhases[i];if(ph.isDefault){alert('Default phases cannot be removed, only renamed.');return;}if(!confirm('Remove phase "'+ph.label+'"? This will delete its checklist data from all circuits.'))return;tmpl.customPhases.splice(i,1);tmpl.cl[ph.key]=undefined;circuits.forEach(c=>{c.phases=c.phases.filter(p=>p.key!==ph.key);});sv(SK,circuits);renderApp();};
+window.addCustPh=()=>{const name=document.getElementById('new-ph-name')?.value?.trim();const key=document.getElementById('new-ph-key')?.value?.trim().replace(/\s+/g,'_');if(!name||!key){alert('Please enter both a phase name and a key.');return;}if(ALL_PH.find(p=>p.key===key)||(tmpl.customPhases||[]).find(p=>p.key===key)){alert('That key already exists. Use a unique key.');return;}if(!tmpl.customPhases)tmpl.customPhases=ALL_PH.map(p=>({key:p.key,label:tmpl.phLabels[p.key]||p.label,isDefault:true}));tmpl.customPhases.push({key,label:name,isDefault:false});if(!tmpl.cl[key])tmpl.cl[key]=[];circuits.forEach(c=>{if(!c.phases.find(p=>p.key===key))c.phases.push(mkPhase(key,c.isDark));});sv(SK,circuits);renderApp();};
+window.resetPhases=()=>{if(!confirm('Reset all phase names to defaults?'))return;tmpl.customPhases=ALL_PH.map(p=>({key:p.key,label:p.label,isDefault:true}));tmpl.phLabels={};circuits.forEach(c=>{c.phases.forEach((ph,i)=>{const def=ALL_PH[i];if(def)ph.label=def.label;});addH(c,'Phase names reset to defaults');});sv(SK,circuits);sv(TK,tmpl);showMsg('Phases reset to defaults.');renderApp();};
+window.saveCustPhases=()=>{if(!tmpl.customPhases)tmpl.customPhases=ALL_PH.map(p=>({key:p.key,label:tmpl.phLabels[p.key]||p.label,isDefault:true}));tmpl.customPhases.forEach(ph=>{tmpl.phLabels[ph.key]=ph.label;});circuits.forEach(c=>{c.phases.forEach((ph,i)=>{const custPh=tmpl.customPhases.find(x=>x.key===ph.key);if(custPh)ph.label=custPh.label;});addH(c,'Phase labels updated from settings');});sv(SK,circuits);sv(TK,tmpl);showMsg('Phase names saved and applied to all circuits.');renderApp();};
+window.saveTmpl=()=>{sv(TK,tmpl);sv('hwct9_stssave',{ts:new Date().toISOString()});ui.settingsDirty=false;gLog('settings','Template saved and applied to all circuits');circuits.forEach(c=>{ALL_PH.forEach((phDef,phIdx)=>{const ph=c.phases[phIdx];if(tmpl.phLabels[phDef.key])ph.label=tmpl.phLabels[phDef.key];const ex=new Set(ph.items.map(i=>i.label));(tmpl.cl[phDef.key]||[]).forEach(l=>{if(!ex.has(l)&&(!l.includes('dark fiber')||c.isDark)){ph.items.push(mkItem(l));ex.add(l);}});});addH(c,'Template applied');});sv(SK,circuits);ui.pendTmpl=false;showMsg('Template saved and applied to all circuits.');renderApp();};
+
+ui.multiOpen=prefs.multiOpen===true;
+syncIL();applyZoom();applyColors();setupAutoBackup();checkDailyBackup();gLog('system','App loaded. '+circuits.length+' in flight, '+queue.length+' in queue, '+completed.length+' completed.');render();
+</script>
+</body>
+</html>
