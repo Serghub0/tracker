@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hotwire Circuit Tracker</title>
+<title>IQ Tracker — Circuit Delivery</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.19.0/iconfont/tabler-icons.min.css">
 <style>
 :root{--bg:#1C2333;--bg2:#252E44;--bg3:#1E2840;--bg4:#1A2236;--brd:#2A3550;--brd2:#3A4560;--tx:#E8EAF0;--tx2:#C8D0E0;--tx3:#8A9BB5;--tx4:#607080;--blue:#185FA5;--blue2:#152440;--blue3:#4A7AB5;--green:#2D5A1B;--green2:#1A3A10;--green3:#5A9A38;--red:#7A2020;--red2:#3A1A1A;--red3:#D06060;--amb:#7A4A10;--amb2:#3A2A10;--amb3:#D08840;--pur:#2A1A5A;--pur3:#9090E0;--r:8px;--r2:12px;--r3:14px}
@@ -236,7 +236,7 @@ a{color:var(--blue3);text-decoration:underline}
 <body>
 <div class="app" id="app"></div>
 <div style="position:fixed;bottom:0;left:0;right:0;background:var(--bg4);border-top:1px solid var(--brd);padding:5px 16px;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--tx4);z-index:50;user-select:none;pointer-events:none">
-  <span>Hotwire Circuit Delivery Tracker &mdash; Designed &amp; built by <strong style="color:var(--tx3)">Serginio Picard</strong> &copy; 2025&ndash;2026. All rights reserved.</span>
+  <span>IQ Tracker &mdash; Circuit Delivery &mdash; Designed &amp; built by <strong style="color:var(--tx3)">Serginio Picard</strong> &copy; 2025&ndash;2026. All rights reserved.</span>
   <span>Proprietary software. Unauthorized use or distribution is prohibited.</span>
 </div>
 <div id="mroot"></div>
@@ -256,7 +256,7 @@ const CONF_ITEMS=['L1 optical test passed','Carrier turn-up confirmed','Completi
 let circuits=fl(SK),archive=fl(AK),deleted=fl(DK),queue=fl(QK),completed=fl(CK),glog=fl(GLK);
 let prefs=fo(PK);
 let tmpl=fo(TK);
-function defTmpl(){return{cl:{order:['Hotwire and Carrier Ticket','Carrier order number confirmed','Circuit ID assigned','Service type & capacity confirmed','CAD set','Protection type confirmed'],osp:['Fiber tail route confirmed','MMP / handhole / vault identified','Splicing scheduled','Splicing complete','OSP construction complete','OTDR PDF received (dark fiber)','OTDR pass/fail confirmed (dark fiber)'],cab_site:['ROW permit approved','Cabinet/enclosure installation scheduled','Cabinet/enclosure installed','Permanent power ordered','Generator ordered (if needed)','Generator on site','Permanent power delivered','Generator removed'],rack:['RU position confirmed','SFP type confirmed with Hotwire engineers','SFP ordered (~30d before ECD)','SFP delivered','SFP ready for smart hands'],carrier_ttu:['Carrier turn-up scheduled','Circuit turn-up confirmed by carrier','Carrier test results received'],loa_xc:['LOA received from carrier','LOA filed and logged','Router port assigned by Hotwire engineers','VLAN assigned','Cross connect order placed','Smart hands dispatched','Cross connect completed and confirmed','Hotwire Ticket Update'],hwc_ttu:['L1 optical verified (Hotwire)','Hotwire internal testing complete','Circuit accepted and signed off','Completion notice PDF received','SiteTracker updated','NCS Record updated','Hotwire Ticket Update','Hotwire Ticket Closed']},phLabels:{},fieldLabels:{},wordSettings:{companyName:'Hotwire Communications',showStatus:true,showPhase:true,showDates:true,showTeam:true,showTechnical:true,showContacts:true,showNotes:false,accentColor:'#1B3F6E'},displaySettings:{defaultSort:'cad',defaultGroup:'',capWarning:40},autoBackup:{onClose:false,daily:false,lastAutoBackup:null},dataSources:{serviceTypes:[...SVC_DEF],carriers:[...CAR_DEF],dataCenters:[...DC_DEF],capacities:[...CAP_DEF]},
+function defTmpl(){return{cl:{order:['Hotwire and Carrier Ticket','Carrier order number confirmed','Circuit ID assigned','Service type & capacity confirmed','CAD set','Protection type confirmed'],osp:['Fiber tail route confirmed','MMP / handhole / vault identified','Splicing scheduled','Splicing complete','OSP construction complete','OTDR PDF received (dark fiber)','OTDR pass/fail confirmed (dark fiber)'],cab_site:['ROW permit approved','Cabinet/enclosure installation scheduled','Cabinet/enclosure installed','Permanent power ordered','Generator ordered (if needed)','Generator on site','Permanent power delivered','Generator removed'],rack:['RU position confirmed','SFP type confirmed with Hotwire engineers','SFP ordered (~30d before ECD)','SFP delivered','SFP ready for smart hands'],carrier_ttu:['Carrier turn-up scheduled','Circuit turn-up confirmed by carrier','Carrier test results received'],loa_xc:['LOA received from carrier','LOA filed and logged','Router port assigned by Hotwire engineers','VLAN assigned','Cross connect order placed','Smart hands dispatched','Cross connect completed and confirmed','Hotwire Ticket Update'],hwc_ttu:['L1 optical verified (Hotwire)','Hotwire internal testing complete','Circuit accepted and signed off','Completion notice PDF received','SiteTracker updated','NCS Record updated','Hotwire Ticket Update','Hotwire Ticket Closed']},phLabels:{},fieldLabels:{},wordSettings:{companyName:'IQ TRACKER',showStatus:true,showPhase:true,showDates:true,showTeam:true,showTechnical:true,showContacts:true,showNotes:false,accentColor:'#1B3F6E'},displaySettings:{defaultSort:'cad',defaultGroup:'',capWarning:40},autoBackup:{onClose:false,daily:false,lastAutoBackup:null},dataSources:{serviceTypes:[...SVC_DEF],carriers:[...CAR_DEF],dataCenters:[...DC_DEF],capacities:[...CAP_DEF]},
     alerts:[
       {id:'risk',enabled:true,label:'At risk',description:'ECD is within N days of CAD',days:30,color:'#D08840',metric:true},
       {id:'urgent',enabled:true,label:'Urgent',description:'Circuit manually flagged urgent',days:null,color:'#D06060',metric:true},
@@ -368,8 +368,8 @@ function renderApp(){
   const capCfg=getAlertCfg('cap');
   const capW=(capCfg&&capCfg.threshold!=null)?capCfg.threshold:(tmpl.displaySettings?.capWarning||40);
   const capOn=capCfg?capCfg.enabled!==false:true;
-  const co=tmpl.wordSettings?.companyName||'Hotwire Communications';
-  let h='<div class="hdr"><div class="hdr-l"><div class="hico"><i class="ti ti-topology-ring-3"></i></div><div><div class="eyebrow">'+co+'</div><div class="htitle">'+(tmpl.displaySettings&&tmpl.displaySettings.trackerName?tmpl.displaySettings.trackerName:'Circuit Delivery Tracker')+'</div></div></div>';
+  const co=tmpl.displaySettings?.companyName||tmpl.wordSettings?.companyName||'IQ TRACKER';
+  let h='<div class="hdr"><div class="hdr-l"><div class="hico"><i class="ti ti-topology-ring-3"></i></div><div><div class="eyebrow">'+co+'</div><div class="htitle">'+(tmpl.displaySettings&&tmpl.displaySettings.trackerName?tmpl.displaySettings.trackerName:'Circuit Delivery')+'</div></div></div>';
   h+='<div class="hdr-r">';
   h+='<button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light" style="font-size:16px;padding:3px 7px">'+(prefs.theme==='dark'?'&#9728;&#65039;':'&#127769;')+'</button>';
   h+='<button class="btn btn-pur btn-sm" onclick="openExp(ui.tab)"><i class="ti ti-file-export"></i> Export</button>';
