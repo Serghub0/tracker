@@ -455,7 +455,7 @@ function renderIF(){
   const divSelCount=[...ui.selCards].filter(id=>id.startsWith('div-')).length;
   if(divSelCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDelDivs()" title="Delete selected dividers"><i class="ti ti-trash"></i> Delete divider ('+divSelCount+')</button>';
   h+='</div>';
-  if(selCount>0)h+='<div class="bulk-bar"><i class="ti ti-checkbox"></i><strong>'+selCount+'</strong> selected &nbsp;<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected</button><button class="btn btn-sm btn-ghost" onclick="clearSel()">Clear</button></div>';
+  if(selCount>0)h+='<div class="bulk-bar"><i class="ti ti-checkbox"></i><strong>'+selCount+'</strong> selected &nbsp;<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected</button><button class="btn btn-sm" onclick="bulkToQueue()"><i class="ti ti-arrow-back-up"></i> Send to Queue</button><button class="btn btn-sm btn-ghost" onclick="clearSel()">Clear</button></div>';
   if(!all.length)return h+'<div class="empty"><i class="ti ti-topology-star-3 empty-icon"></i>No circuits. Click <strong>New circuit</strong>.</div>';
   if(ui.ifGroup){
     const groups={};all.forEach(c=>{if(!fids.has(c.id))return;const k=ui.ifGroup==='engineer'?c.transportEngineer||'Unassigned':ui.ifGroup==='service'?c.serviceType||'Unknown':ui.ifGroup==='site'?c.zEnd||'Unknown site':c.urgent?'Urgent':'Normal';if(!groups[k])groups[k]=[];groups[k].push(c);});
@@ -1611,6 +1611,36 @@ window.createC=()=>{
     circuits.push(c);sv(SK,circuits);syncIL();ui.sel=c.id;ui.phTab[c.id]=0;
   }
   closeM();renderApp();
+};
+window.bulkToQueue=()=>{
+  const ids=[...ui.selCards].filter(id=>circuits.find(x=>x.id===id));
+  if(!ids.length){showMsg('No circuits selected.');return;}
+  if(!confirm('Send '+ids.length+' circuit(s) back to In Queue?'))return;
+  ids.forEach(id=>{
+    const c=circuits.find(x=>x.id===id);if(!c)return;
+    addH(c,'Returned to In Queue from In Flight');
+    queue.push(c);
+    circuits=circuits.filter(x=>x.id!==id);
+    iList=iList.filter(x=>x.type==='group'||x.id!==id);
+  });
+  sv(SK,circuits);sv(QK,queue);sv(LK,iList);
+  ui.selCards.clear();ui.sel=null;
+  ui.tab='queue';
+  showMsg(ids.length+' circuit(s) moved to In Queue.');
+  renderApp();
+};
+window.ifToQueue=id=>{
+  if(!confirm('Send this circuit back to In Queue?'))return;
+  const c=circuits.find(x=>x.id===id);if(!c)return;
+  addH(c,'Returned to In Queue from In Flight');
+  queue.push(c);
+  circuits=circuits.filter(x=>x.id!==id);
+  iList=iList.filter(x=>x.type==='group'||x.id!==id);
+  sv(SK,circuits);sv(QK,queue);sv(LK,iList);
+  ui.sel=null;
+  ui.tab='queue';
+  showMsg(dn(c)+' moved back to In Queue.');
+  renderApp();
 };
 window.softDel=id=>{if(!confirm('Move to deleted? Recoverable for 30 days.'))return;const c=circuits.find(x=>x.id===id);if(!c)return;c.deletedAt=new Date().toISOString();c.deletedFrom='inflight';addH(c,'Moved to deleted');deleted.unshift(c);circuits=circuits.filter(x=>x.id!==id);iList=iList.filter(x=>x.type==='group'||x.id!==id);if(ui.sel===id)ui.sel=null;sv(SK,circuits);sv(DK,deleted);sv(LK,iList);renderApp();};
 window.softDelA=id=>{if(!confirm('Move to deleted?'))return;const c=archive.find(x=>x.id===id);if(!c)return;c.deletedAt=new Date().toISOString();addH(c,'Moved to deleted from archive');deleted.unshift(c);archive=archive.filter(x=>x.id!==id);if(ui.archSel===id)ui.archSel=null;sv(AK,archive);sv(DK,deleted);renderApp();};
