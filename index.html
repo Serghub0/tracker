@@ -369,7 +369,8 @@ function renderApp(){
   const capW=(capCfg&&capCfg.threshold!=null)?capCfg.threshold:(tmpl.displaySettings?.capWarning||40);
   const capOn=capCfg?capCfg.enabled!==false:true;
   const co=tmpl.displaySettings?.companyName||tmpl.wordSettings?.companyName||'IQ TRACKER';
-  let h='<div class="hdr"><div class="hdr-l"><div class="hico"><i class="ti ti-topology-ring-3"></i></div><div><div class="eyebrow">'+co+'</div><div class="htitle">'+(tmpl.displaySettings&&tmpl.displaySettings.trackerName?tmpl.displaySettings.trackerName:'Circuit Delivery')+'</div></div></div>';
+  const _li=tmpl.displaySettings&&tmpl.displaySettings.logoImg;
+  let h='<div class="hdr"><div class="hdr-l">'+(_li?'<div class="hico" style="overflow:hidden;padding:0"><img src="'+_li+'" style="width:100%;height:100%;object-fit:cover;border-radius:9px"></div>':'<div class="hico"><i class="ti ti-topology-ring-3"></i></div>')+'<div><div class="eyebrow">'+co+'</div><div class="htitle">'+(tmpl.displaySettings&&tmpl.displaySettings.trackerName?tmpl.displaySettings.trackerName:'Circuit Delivery')+'</div></div></div>';
   h+='<div class="hdr-r">';
   h+='<button class="btn btn-ghost btn-sm" onclick="toggleTheme()" title="Toggle dark/light" style="font-size:16px;padding:3px 7px">'+(prefs.theme==='dark'?'&#9728;&#65039;':'&#127769;')+'</button>';
   h+='<button class="btn btn-pur btn-sm" onclick="openExp(ui.tab)"><i class="ti ti-file-export"></i> Export</button>';
@@ -1237,6 +1238,7 @@ function renderSettings(){
     body+=colorRow('Urgent status color','Red indicator for urgent circuits','urgentColor','#4A0A0A');
     body+=colorRow('At risk / warning color','Amber for ECD near CAD alerts','warningColor','#3A2A10');
     body+=colorRow('Urgent card border','Left border accent on urgent cards','urgentBorder','#D06060');
+    body+='<div class="srow"><div><div class="slbl">Logo image</div><div class="ssub">Upload a PNG or JPG logo to replace the icon in the top-left corner</div></div><div style="display:flex;align-items:center;gap:8px">'+(ds.logoImg?'<img src="'+ds.logoImg+'" style="width:36px;height:36px;object-fit:cover;border-radius:8px;border:1px solid var(--brd)">':'<div style="width:36px;height:36px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#BFD8F5"><i class="ti ti-topology-ring-3"></i></div>')+'<label class="btn btn-sm" style="cursor:pointer"><i class="ti ti-upload"></i> Upload<input type="file" accept="image/*" style="display:none" onchange="uploadLogo(this)"></label>'+(ds.logoImg?'<button class="btn btn-sm btn-ghost" onclick="removeLogo()"><i class="ti ti-x"></i> Remove</button>':'')+'</div></div>';
     body+='<div class="srow"><div><div class="slbl">Company name</div><div class="ssub">Shown in header eyebrow and Word doc</div></div><input class="sinp2" value="'+(tmpl.wordSettings?.companyName||'Hotwire Communications').replace(/"/g,'&quot;')+'" onchange="updWS(\'companyName\',this.value)" style="width:220px"></div>';
         const _curPx=prefs.fontSize||13;
     body+='<div class="srow"><div><div class="slbl">Base font size</div><div class="ssub">11px–15px supported. Changes preview immediately, Save to make permanent.</div></div><div style="display:flex;align-items:center;gap:7px"><select class="ssel2" onchange="updFontSize(this.value)"><option value="11" '+(_curPx===11?'selected':'')+'>Small (11px)</option><option value="12" '+(_curPx===12?'selected':'')+'>Medium (12px)</option><option value="13" '+(_curPx===13?'selected':'')+'>Normal (13px)</option><option value="14" '+(_curPx===14?'selected':'')+'>Large (14px)</option><option value="15" '+(_curPx===15?'selected':'')+'>Extra large (15px)</option></select><button class="btn btn-xs btn-ghost" onclick="updFontSize(13)"><i class="ti ti-refresh"></i> Default</button></div></div>';
@@ -1914,6 +1916,27 @@ window.resetClr=(key,def)=>{ui.settingsDirty=true;
   const el=document.getElementById('clr-'+key);
   if(el)el.value=def;
   applyColors();renderApp();
+};
+window.uploadLogo=function(input){
+  var file=input.files&&input.files[0];
+  if(!file)return;
+  if(file.size>500000){alert('Image too large. Please use an image under 500KB.');return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    if(!tmpl.displaySettings)tmpl.displaySettings={};
+    tmpl.displaySettings.logoImg=e.target.result;
+    sv(TK,tmpl);
+    showMsg('Logo uploaded.');
+    renderApp();
+  };
+  reader.readAsDataURL(file);
+};
+window.removeLogo=function(){
+  if(!confirm('Remove logo and restore the default icon?'))return;
+  if(tmpl.displaySettings)delete tmpl.displaySettings.logoImg;
+  sv(TK,tmpl);
+  showMsg('Logo removed.');
+  renderApp();
 };
 window.updFontSize=v=>{
   const px=Math.min(15,Math.max(11,parseInt(v)||13));
