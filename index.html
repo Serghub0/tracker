@@ -449,7 +449,7 @@ function renderIF(){
   let h='<div class="toolbar">';
   h+='<input class="sinp" placeholder="Search circuits..." value="'+(ui.ifSrch||'').replace(/"/g,'&quot;')+'" oninput="setIFS(this.value)" style="max-width:220px">';
   if(ui.ifFilter)h+='<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:20px;background:var(--amb2);color:var(--amb3);border:1px solid var(--amb3)"><i class="ti ti-filter"></i> '+(ui.ifFilter==='risk'?'At risk':'Urgent / Warning')+' <button onclick="clearFilter()" style="border:none;background:transparent;color:var(--amb3);cursor:pointer;font-size:12px;line-height:1;padding:0 0 0 3px">&times;</button></span>';
-  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option></select>';
+  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option></select>';
   if(selCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected ('+selCount+')</button>';
   const divSelCount=[...ui.selCards].filter(id=>id.startsWith('div-')).length;
   if(divSelCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDelDivs()" title="Delete selected dividers"><i class="ti ti-trash"></i> Delete divider ('+divSelCount+')</button>';
@@ -457,7 +457,6 @@ function renderIF(){
   if(selCount>0)h+='<div class="bulk-bar"><i class="ti ti-checkbox"></i><strong>'+selCount+'</strong> selected &nbsp;<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected</button><button class="btn btn-sm" onclick="bulkToQueue()"><i class="ti ti-arrow-back-up"></i> Send to Queue</button><button class="btn btn-sm btn-ghost" onclick="clearSel()">Clear</button></div>';
   if(!all.length)return h+'<div class="empty"><i class="ti ti-topology-star-3 empty-icon"></i>No circuits. Click <strong>New circuit</strong>.</div>';
   if(ui.ifGroup){
-    const groups={};all.forEach(c=>{if(!fids.has(c.id))return;const k=ui.ifGroup==='engineer'?c.transportEngineer||'Unassigned':ui.ifGroup==='service'?c.serviceType||'Unknown':ui.ifGroup==='site'?c.zEnd||'Unknown site':ui.ifGroup==='carrier'?c.carrier||'Unknown carrier':ui.ifGroup==='protection'?c.protection||'Unprotected':ui.ifGroup==='circuitid'?c.circuitId||'No Circuit ID':c.urgent?'Urgent':'Normal';if(!groups[k])groups[k]=[];groups[k].push(c);});
     // % grouping: bucket into 0-24, 25-49, 50-74, 75-99, 100
     if(ui.ifGroup==='pct'){
       const buckets={'0–24%':[],'25–49%':[],'50–74%':[],'75–99%':[],'100% Done':[]};
@@ -470,6 +469,37 @@ function renderIF(){
       Object.entries(buckets).forEach(([g,list])=>{if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
       return h;
     }
+    // CAD grouping: sort by date, group by month
+    if(ui.ifGroup==='cad'){
+      const cadGroups={};
+      all.filter(c=>fids.has(c.id)).sort((a,b)=>(a.cad||'9999')>(b.cad||'9999')?1:-1).forEach(c=>{
+        const k=c.cad?new Date(c.cad+'T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'}):'No CAD set';
+        if(!cadGroups[k])cadGroups[k]=[];cadGroups[k].push(c);
+      });
+      Object.entries(cadGroups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-calendar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
+      return h;
+    }
+    // CAD/Carrier grouping: group by CAD month, then sub-group by carrier
+    if(ui.ifGroup==='cad_carrier'){
+      const cadGroups={};
+      all.filter(c=>fids.has(c.id)).sort((a,b)=>(a.cad||'9999')>(b.cad||'9999')?1:-1).forEach(c=>{
+        const cadKey=c.cad?new Date(c.cad+'T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'}):'No CAD set';
+        if(!cadGroups[cadKey])cadGroups[cadKey]={};
+        const carrKey=c.carrier||'Unknown carrier';
+        if(!cadGroups[cadKey][carrKey])cadGroups[cadKey][carrKey]=[];
+        cadGroups[cadKey][carrKey].push(c);
+      });
+      Object.entries(cadGroups).forEach(([cadG,carriers])=>{
+        const totalInCad=Object.values(carriers).reduce((s,l)=>s+l.length,0);
+        h+='<div class="grp-hdr"><i class="ti ti-calendar"></i>'+cadG+' <span class="nbadge">'+totalInCad+'</span></div>';
+        Object.entries(carriers).sort(([a],[b])=>a.localeCompare(b)).forEach(([carrG,list])=>{
+          h+='<div class="grp-hdr" style="margin-left:18px;font-size:11px;opacity:.85"><i class="ti ti-building-broadcast-tower"></i>'+carrG+' <span class="nbadge">'+list.length+'</span></div>';
+          list.forEach(c=>{h+=renderCard(c,false);});
+        });
+      });
+      return h;
+    }
+    const groups={};all.forEach(c=>{if(!fids.has(c.id))return;const k=ui.ifGroup==='engineer'?c.transportEngineer||'Unassigned':ui.ifGroup==='service'?c.serviceType||'Unknown':ui.ifGroup==='site'?c.zEnd||'Unknown site':ui.ifGroup==='carrier'?c.carrier||'Unknown carrier':ui.ifGroup==='protection'?c.protection||'Unprotected':ui.ifGroup==='circuitid'?c.circuitId||'No Circuit ID':c.urgent?'Urgent':'Normal';if(!groups[k])groups[k]=[];groups[k].push(c);});
     Object.entries(groups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-folder"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});return h;
   }
   h+='<div id="if-list" ondragover="listDO(event)" ondrop="listDrop(event)">';
