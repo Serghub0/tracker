@@ -427,7 +427,12 @@ function renderApp(){
   else if(ui.tab==='completed'){h+=renderCompleted();}
   else if(ui.tab==='deleted'){h+=renderDel();}
   else if(ui.tab==='settings'){h+=renderSettings();}
+  const _aEl=document.activeElement;
+  const _fPh=_aEl&&_aEl.classList.contains('sinp')?_aEl.placeholder:null;
+  const _ss=_aEl?_aEl.selectionStart:null;
+  const _se=_aEl?_aEl.selectionEnd:null;
   app.innerHTML=h;
+  if(_fPh){const _r=app.querySelector('.sinp[placeholder="'+_fPh+'"]');if(_r){_r.focus();try{_r.setSelectionRange(_ss,_se);}catch(e){}}}
 }
 
 function renderIF(){
