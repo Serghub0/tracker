@@ -305,7 +305,7 @@ if(!tmpl.cl)tmpl=defTmpl();
 if(!prefs.theme)prefs.theme='dark';
 let iList=fl(LK);
 deleted=deleted.filter(c=>new Date(c.deletedAt||0).getTime()>Date.now()-30*864e5);sv(DK,deleted);
-let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
+let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',ifRecentDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
 let dgSrc=null,ciDg=null;
 
 function mkItem(label,isEcd){return{label,done:false,date:'',note:'',links:[],isEcd:!!isEcd,ecdDate:'',ecdCond:''};}
@@ -454,7 +454,7 @@ function renderIF(){
   let h='<div class="toolbar">';
   h+='<input class="sinp" placeholder="Search circuits..." value="'+(ui.ifSrch||'').replace(/"/g,'&quot;')+'" oninput="setIFS(this.value)" style="max-width:220px">';
   if(ui.ifFilter)h+='<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:20px;background:var(--amb2);color:var(--amb3);border:1px solid var(--amb3)"><i class="ti ti-filter"></i> '+(ui.ifFilter==='risk'?'At risk':'Urgent / Warning')+' <button onclick="clearFilter()" style="border:none;background:transparent;color:var(--amb3);cursor:pointer;font-size:12px;line-height:1;padding:0 0 0 3px">&times;</button></span>';
-  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option></select>';
+  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option><option value="recent" '+(ui.ifGroup==='recent'?'selected':'')+'>Group: Recently Added</option></select>';
   if(selCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected ('+selCount+')</button>';
   const divSelCount=[...ui.selCards].filter(id=>id.startsWith('div-')).length;
   if(divSelCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDelDivs()" title="Delete selected dividers"><i class="ti ti-trash"></i> Delete divider ('+divSelCount+')</button>';
@@ -477,6 +477,66 @@ function renderIF(){
       const _dirLbl=_isDesc?'↓ High → Low':'↑ Low → High';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">% Progress order:</span><button class="btn btn-xs btn-ghost" onclick="togglePctDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
       _ordKeys.forEach(g=>{const list=buckets[g];if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
+      return h;
+    }
+    // Recently Added grouping: sort by createdAt, group by week
+    if(ui.ifGroup==='recent'){
+      const _isNew=ui.ifRecentDir!=='asc';
+      const _dirLbl=_isNew?'↓ Newest → Oldest':'↑ Oldest → Newest';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">Recently added order:</span><button class="btn btn-xs btn-ghost" onclick="toggleRecentDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
+      const _sorted=all.filter(c=>fids.has(c.id)).sort((a,b)=>{
+        const ta=a.createdAt?new Date(a.createdAt).getTime():0;
+        const tb=b.createdAt?new Date(b.createdAt).getTime():0;
+        return _isNew?tb-ta:ta-tb;
+      });
+      const _recentGroups={};
+      _sorted.forEach(c=>{
+        const ts=c.createdAt?new Date(c.createdAt):null;
+        let gk='Unknown date';
+        if(ts){
+          const now=new Date();const diffMs=now-ts;const diffDays=Math.floor(diffMs/86400000);
+          if(diffDays===0)gk='Today';
+          else if(diffDays===1)gk='Yesterday';
+          else if(diffDays<=7)gk='This week';
+          else if(diffDays<=14)gk='Last week';
+          else if(diffDays<=30)gk='This month';
+          else if(diffDays<=60)gk='Last month';
+          else{gk=ts.toLocaleDateString('en-US',{month:'long',year:'numeric'});}
+        }
+        if(!_recentGroups[gk])_recentGroups[gk]=[];
+        _recentGroups[gk].push(c);
+      });
+      Object.entries(_recentGroups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-clock"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
+      return h;
+    }
+    // Recently Added grouping: sort by createdAt, group by recency
+    if(ui.ifGroup==='recent'){
+      const _isNew=ui.ifRecentDir!=='asc';
+      const _dirLbl=_isNew?'↓ Newest → Oldest':'↑ Oldest → Newest';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">Recently added order:</span><button class="btn btn-xs btn-ghost" onclick="toggleRecentDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
+      const _sorted=all.filter(c=>fids.has(c.id)).sort((a,b)=>{
+        const ta=a.createdAt?new Date(a.createdAt).getTime():0;
+        const tb=b.createdAt?new Date(b.createdAt).getTime():0;
+        return _isNew?tb-ta:ta-tb;
+      });
+      const _recentGroups={};
+      _sorted.forEach(c=>{
+        const ts=c.createdAt?new Date(c.createdAt):null;
+        let gk='Unknown date';
+        if(ts){
+          const now=new Date();const diffDays=Math.floor((now-ts)/86400000);
+          if(diffDays===0)gk='Today';
+          else if(diffDays===1)gk='Yesterday';
+          else if(diffDays<=7)gk='This week';
+          else if(diffDays<=14)gk='Last week';
+          else if(diffDays<=30)gk='This month';
+          else if(diffDays<=60)gk='Last month';
+          else gk=ts.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        }
+        if(!_recentGroups[gk])_recentGroups[gk]=[];
+        _recentGroups[gk].push(c);
+      });
+      Object.entries(_recentGroups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-clock"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
       return h;
     }
     // CAD grouping: sort by date, group by month
@@ -1473,7 +1533,8 @@ window.dismissRisk=id=>{if(!ui.dismissedRisk)ui.dismissedRisk=new Set();ui.dismi
 window.setIFSToCircuit=id=>{ui.sel=id;const c=circuits.find(x=>x.id===id);if(c&&ui.phTab[id]===undefined)ui.phTab[id]=c.currentPhase;renderApp();const el=document.getElementById('cc-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});};
 window.filterUrgent=()=>{ui.ifFilter=ui.ifFilter==='urgent'?'':'urgent';ui.ifSrch='';renderApp();};
 window.setIFSort=v=>{ui.ifSort=v;renderApp();};
-window.setIFGroup=v=>{ui.ifGroup=v;if(v==='pct')ui.ifPctDir='desc';renderApp();};
+window.setIFGroup=v=>{ui.ifGroup=v;if(v==='pct')ui.ifPctDir='desc';if(v==='recent')ui.ifRecentDir='desc';renderApp();};
+window.toggleRecentDir=()=>{ui.ifRecentDir=ui.ifRecentDir==='desc'?'asc':'desc';renderApp();};
 window.togglePctDir=()=>{ui.ifPctDir=ui.ifPctDir==='desc'?'asc':'desc';renderApp();};
 window.toggleTheme=()=>{prefs.theme=prefs.theme==='dark'?'light':'dark';sv(PK,prefs);render();};
 window.setThemePref=t=>{
