@@ -305,7 +305,7 @@ if(!tmpl.cl)tmpl=defTmpl();
 if(!prefs.theme)prefs.theme='dark';
 let iList=fl(LK);
 deleted=deleted.filter(c=>new Date(c.deletedAt||0).getTime()>Date.now()-30*864e5);sv(DK,deleted);
-let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
+let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
 let dgSrc=null,ciDg=null;
 
 function mkItem(label,isEcd){return{label,done:false,date:'',note:'',links:[],isEcd:!!isEcd,ecdDate:'',ecdCond:''};}
@@ -464,6 +464,7 @@ function renderIF(){
   if(ui.ifGroup){
     // % grouping: bucket into 0-24, 25-49, 50-74, 75-99, 100
     if(ui.ifGroup==='pct'){
+      const bucketOrder=['100% Done','75–99%','50–74%','25–49%','0–24%'];
       const buckets={'0–24%':[],'25–49%':[],'50–74%':[],'75–99%':[],'100% Done':[]};
       all.filter(c=>fids.has(c.id)).forEach(c=>{
         const vph=visPh(c);const done=vph.filter(v=>v.ph.done).length;
@@ -471,7 +472,11 @@ function renderIF(){
         const bkt=pct===100?'100% Done':pct>=75?'75–99%':pct>=50?'50–74%':pct>=25?'25–49%':'0–24%';
         buckets[bkt].push(c);
       });
-      Object.entries(buckets).forEach(([g,list])=>{if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
+      const _isDesc=ui.ifPctDir!=='asc';
+      const _ordKeys=_isDesc?bucketOrder:[...bucketOrder].reverse();
+      const _dirLbl=_isDesc?'↓ High → Low':'↑ Low → High';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">% Progress order:</span><button class="btn btn-xs btn-ghost" onclick="togglePctDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
+      _ordKeys.forEach(g=>{const list=buckets[g];if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
       return h;
     }
     // CAD grouping: sort by date, group by month
@@ -1468,7 +1473,8 @@ window.dismissRisk=id=>{if(!ui.dismissedRisk)ui.dismissedRisk=new Set();ui.dismi
 window.setIFSToCircuit=id=>{ui.sel=id;const c=circuits.find(x=>x.id===id);if(c&&ui.phTab[id]===undefined)ui.phTab[id]=c.currentPhase;renderApp();const el=document.getElementById('cc-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});};
 window.filterUrgent=()=>{ui.ifFilter=ui.ifFilter==='urgent'?'':'urgent';ui.ifSrch='';renderApp();};
 window.setIFSort=v=>{ui.ifSort=v;renderApp();};
-window.setIFGroup=v=>{ui.ifGroup=v;renderApp();};
+window.setIFGroup=v=>{ui.ifGroup=v;if(v==='pct')ui.ifPctDir='desc';renderApp();};
+window.togglePctDir=()=>{ui.ifPctDir=ui.ifPctDir==='desc'?'asc':'desc';renderApp();};
 window.toggleTheme=()=>{prefs.theme=prefs.theme==='dark'?'light':'dark';sv(PK,prefs);render();};
 window.setThemePref=t=>{
   if(prefs.theme===t)return;
