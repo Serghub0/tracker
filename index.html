@@ -308,6 +308,16 @@ deleted=deleted.filter(c=>new Date(c.deletedAt||0).getTime()>Date.now()-30*864e5
 let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
 let dgSrc=null,ciDg=null;
 
+// ── Wake Lock (always-on) ─────────────────────────────────────────────────
+let _wl=null;
+async function _wlAcquire(){
+  if(!('wakeLock' in navigator))return;
+  try{_wl=await navigator.wakeLock.request('screen');_wl.addEventListener('release',()=>{_wl=null;});}catch(e){}
+}
+_wlAcquire();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_wlAcquire();});
+// ─────────────────────────────────────────────────────────────────────────
+
 function mkItem(label,isEcd){return{label,done:false,date:'',note:'',links:[],isEcd:!!isEcd,ecdDate:'',ecdCond:''};}
 function mkPhase(key,isDark){
   const cl=tmpl.cl[key]||[];const items=[];
