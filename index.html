@@ -305,7 +305,7 @@ if(!tmpl.cl)tmpl=defTmpl();
 if(!prefs.theme)prefs.theme='dark';
 let iList=fl(LK);
 deleted=deleted.filter(c=>new Date(c.deletedAt||0).getTime()>Date.now()-30*864e5);sv(DK,deleted);
-let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',ifRecentDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
+let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
 let dgSrc=null,ciDg=null;
 
 function mkItem(label,isEcd){return{label,done:false,date:'',note:'',links:[],isEcd:!!isEcd,ecdDate:'',ecdCond:''};}
@@ -404,131 +404,6 @@ function renderApp(){
     if(_urgCfg.enabled!==false&&_urgCfg.metric!==false)h+='<div class="mc" style="cursor:pointer;border-left:3px solid '+_urgCfg.color+'" onclick="filterUrgent()" title="Click to filter"><div class="mc-top"><span class="mc-lbl">'+_urgCfg.label+'</span><div class="mc-ico" style="background:var(--red2);color:var(--red3)"><i class="ti ti-flame"></i></div></div><div class="mc-val">'+circuits.filter(c=>c.urgent||c.priority>0).length+'</div><div class="mc-sub" style="color:var(--blue3)">click to filter</div></div>';
     if(_riskCfg.enabled!==false&&_riskCfg.metric!==false)h+='<div class="mc" style="cursor:pointer;border-left:3px solid '+_riskCfg.color+'" onclick="filterRisk()" title="Click to filter"><div class="mc-top"><span class="mc-lbl">'+_riskCfg.label+'</span><div class="mc-ico" style="background:var(--amb2);color:var(--amb3)"><i class="ti ti-alert-triangle"></i></div></div><div class="mc-val">'+risky.length+'</div><div class="mc-sub" style="color:var(--blue3)">click to filter</div></div>';
     _allAlerts.filter(a=>a.metric&&a.id!=='urgent'&&a.id!=='risk'&&a.enabled!==false).forEach(al=>{h+='<div class="mc" style="border-left:3px solid '+(al.color||'#888')+'"><div class="mc-top"><span class="mc-lbl">'+al.label+'</span></div><div class="mc-val">--</div><div class="mc-sub">custom</div></div>';});
-    // Smart summary box — adapts to active grouping
-    try{
-      let _smh='';
-      const _grp=ui.ifGroup;
-      const _all=circuits;
-      const _visPh2=c=>{try{return(c.phases||[]).map((p,i)=>{const ph=ALL_PH[i];return ph&&(ph.serviceTypes||[ph.id]).some(s=>c.serviceType&&c.serviceType.toLowerCase().includes(s.toLowerCase()))||(!ph?.serviceTypes?.length)?{ph:p,i}:null;}).filter(Boolean);}catch(e){return[];}};
-
-      if(!_grp||_grp==='urgent'||_grp==='recent'){
-        // Default: progress donut of all in-flight
-        const _total=_all.length;
-        if(_total>0){
-          const _pcts=_all.map(c=>{try{const vph=_visPh2(c);const done=vph.filter(v=>v.ph&&v.ph.done).length;return vph.length>0?Math.round((done/vph.length)*100):0;}catch(e){return 0;}});
-          const _avg=Math.round(_pcts.reduce((s,p)=>s+p,0)/_total);
-          const _done=_pcts.filter(p=>p===100).length;
-          const _inprog=_pcts.filter(p=>p>0&&p<100).length;
-          const _notst=_pcts.filter(p=>p===0).length;
-          // SVG donut
-          const _r=28,_cx=36,_cy=36,_circ=2*Math.PI*_r;
-          const _segs=[{v:_done,color:'#4caf50'},{v:_inprog,color:'#2196f3'},{v:_notst,color:'#37415180'}];
-          let _offset=0;
-          let _svg='<svg width="72" height="72" viewBox="0 0 72 72" style="flex-shrink:0">';
-          _svg+='<circle cx="'+_cx+'" cy="'+_cy+'" r="'+_r+'" fill="none" stroke="var(--bg4)" stroke-width="10"/>';
-          _segs.forEach(seg=>{if(!seg.v)return;const _len=(_circ*seg.v/_total);_svg+='<circle cx="'+_cx+'" cy="'+_cy+'" r="'+_r+'" fill="none" stroke="'+seg.color+'" stroke-width="10" stroke-dasharray="'+_len+' '+(_circ-_len)+'" stroke-dashoffset="'+(-_offset+_circ/4*-1+_circ)+'" transform="rotate(-90 '+_cx+' '+_cy+')"/>';_offset+=_len;});
-          _svg+='<text x="'+_cx+'" y="'+(+_cy+1)+'" text-anchor="middle" dominant-baseline="middle" fill="var(--tx1)" font-size="13" font-weight="700">'+_avg+'%</text>';
-          _svg+='<text x="'+_cx+'" y="'+(+_cy+13)+'" text-anchor="middle" dominant-baseline="middle" fill="var(--tx4)" font-size="7">avg</text>';
-          _svg+='</svg>';
-          _smh='<div style="display:flex;align-items:center;gap:10px;width:100%">'+_svg;
-          _smh+='<div style="flex:1;min-width:0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:5px">Overall Progress</div>';
-          _smh+='<div style="display:flex;flex-direction:column;gap:3px">';
-          _smh+='<div style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#4caf50;flex-shrink:0"></span><span style="font-size:10px;color:var(--tx2)">Done</span><span style="margin-left:auto;font-size:11px;font-weight:700;color:#4caf50">'+_done+'</span></div>';
-          _smh+='<div style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#2196f3;flex-shrink:0"></span><span style="font-size:10px;color:var(--tx2)">In progress</span><span style="margin-left:auto;font-size:11px;font-weight:700;color:#2196f3">'+_inprog+'</span></div>';
-          _smh+='<div style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--tx4);flex-shrink:0"></span><span style="font-size:10px;color:var(--tx2)">Not started</span><span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--tx4)">'+_notst+'</span></div>';
-          _smh+='</div></div></div>';
-        }
-      } else if(_grp==='pct'){
-        // % progress: bar chart of buckets
-        const _bNames=['0\u201324%','25\u201349%','50\u201374%','75\u201399%','100% Done'];
-        const _bColors=['#f44336','#ff9800','#ffeb3b','#2196f3','#4caf50'];
-        const _bcounts=_bNames.map(()=>0);
-        _all.forEach(c=>{try{const vph=_visPh2(c);const done=vph.filter(v=>v.ph&&v.ph.done).length;const pct=vph.length>0?Math.round((done/vph.length)*100):0;const bi=pct===100?4:pct>=75?3:pct>=50?2:pct>=25?1:0;_bcounts[bi]++;}catch(e){}});
-        const _max=Math.max(..._bcounts,1);
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">Progress Distribution</div>';
-        _smh+='<div style="display:flex;flex-direction:column;gap:3px">';
-        _bNames.forEach((b,i)=>{
-          const w=Math.round((_bcounts[i]/_max)*100);
-          _smh+='<div style="display:flex;align-items:center;gap:5px">';
-          _smh+='<span style="font-size:9px;color:var(--tx3);width:42px;flex-shrink:0">'+b+'</span>';
-          _smh+='<div style="flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+_bColors[i]+';border-radius:4px;transition:width .3s"></div></div>';
-          _smh+='<span style="font-size:10px;font-weight:700;color:'+_bColors[i]+';width:14px;text-align:right">'+_bcounts[i]+'</span>';
-          _smh+='</div>';
-        });
-        _smh+='</div></div>';
-      } else if(_grp==='carrier'||_grp==='cad_carrier'){
-        // Carrier breakdown
-        const _cmap={};_all.forEach(c=>{const k=c.carrier||'Unknown';_cmap[k]=(_cmap[k]||0)+1;});
-        const _sorted=Object.entries(_cmap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        const _tot=_all.length||1;
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">Carriers ('+_all.length+' circuits)</div>';
-        _smh+='<div style="display:flex;flex-direction:column;gap:3px">';
-        const _palette=['#2196f3','#9c27b0','#009688','#ff9800','#e91e63'];
-        _sorted.forEach(([k,v],i)=>{const w=Math.round((v/_tot)*100);_smh+='<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;color:var(--tx3);width:54px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+k+'">'+k+'</span><div style="flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+_palette[i%5]+';border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:'+_palette[i%5]+';width:14px;text-align:right">'+v+'</span></div>';});
-        _smh+='</div></div>';
-      } else if(_grp==='service'){
-        const _smap={};_all.forEach(c=>{const k=c.serviceType||'Unknown';_smap[k]=(_smap[k]||0)+1;});
-        const _sorted=Object.entries(_smap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        const _tot=_all.length||1;
-        const _palette=['#2196f3','#9c27b0','#009688','#ff9800','#e91e63'];
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">Service Types</div><div style="display:flex;flex-direction:column;gap:3px">';
-        _sorted.forEach(([k,v],i)=>{const w=Math.round((v/_tot)*100);_smh+='<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;color:var(--tx3);width:54px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+k+'">'+k+'</span><div style="flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+_palette[i%5]+';border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:'+_palette[i%5]+';width:14px;text-align:right">'+v+'</span></div>';});
-        _smh+='</div></div>';
-      } else if(_grp==='cad'){
-        // Upcoming CAD deadlines
-        const _now=new Date();
-        const _soon=_all.filter(c=>{if(!c.cad)return false;const d=new Date(c.cad+'T00:00:00');return d>=_now;}).sort((a,b)=>new Date(a.cad+'T00:00:00')-new Date(b.cad+'T00:00:00'));
-        const _overdue=_all.filter(c=>{if(!c.cad)return false;return new Date(c.cad+'T00:00:00')<_now;});
-        const _nocad=_all.filter(c=>!c.cad);
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">CAD Overview</div>';
-        _smh+='<div style="display:flex;flex-direction:column;gap:4px">';
-        _smh+='<div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--tx3)">Overdue</span><span style="font-size:11px;font-weight:700;color:#f44336">'+_overdue.length+'</span></div>';
-        if(_soon[0]){const _nd=new Date(_soon[0].cad+'T00:00:00');const _days=Math.ceil((_nd-_now)/86400000);_smh+='<div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--tx3)">Next due</span><span style="font-size:10px;font-weight:700;color:var(--amb3)">'+_soon[0].name+' ('+_days+'d)</span></div>';}
-        _smh+='<div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--tx3)">Upcoming</span><span style="font-size:11px;font-weight:700;color:#2196f3">'+_soon.length+'</span></div>';
-        _smh+='<div style="display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--tx3)">No CAD set</span><span style="font-size:11px;font-weight:700;color:var(--tx4)">'+_nocad.length+'</span></div>';
-        _smh+='</div></div>';
-      } else if(_grp==='protection'){
-        const _pmap={};_all.forEach(c=>{const k=c.protection||'Unprotected';_pmap[k]=(_pmap[k]||0)+1;});
-        const _tot=_all.length||1;
-        const _prot=_pmap['Protected']||0;const _unprot=_tot-_prot;
-        const _pw=Math.round((_prot/_tot)*100);
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">Protection Status</div>';
-        _smh+='<div style="height:10px;background:var(--bg4);border-radius:5px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:'+_pw+'%;background:#4caf50;border-radius:5px;transition:width .3s"></div></div>';
-        _smh+='<div style="display:flex;justify-content:space-between">';
-        _smh+='<span style="font-size:10px;color:#4caf50"><i class="ti ti-shield-check"></i> Protected: <strong>'+_prot+'</strong></span>';
-        _smh+='<span style="font-size:10px;color:#f44336"><i class="ti ti-shield-off"></i> Unprotected: <strong>'+_unprot+'</strong></span>';
-        _smh+='</div></div>';
-      } else if(_grp==='engineer'){
-        const _emap={};_all.forEach(c=>{const k=c.transportEngineer||'Unassigned';_emap[k]=(_emap[k]||0)+1;});
-        const _sorted=Object.entries(_emap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        const _tot=_all.length||1;
-        const _palette=['#2196f3','#9c27b0','#009688','#ff9800','#e91e63'];
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">Engineer Workload</div><div style="display:flex;flex-direction:column;gap:3px">';
-        _sorted.forEach(([k,v],i)=>{const w=Math.round((v/_tot)*100);_smh+='<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;color:var(--tx3);width:54px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+k+'">'+k+'</span><div style="flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+_palette[i%5]+';border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:'+_palette[i%5]+';width:14px;text-align:right">'+v+'</span></div>';});
-        _smh+='</div></div>';
-      } else if(_grp==='site'){
-        const _smap={};_all.forEach(c=>{const k=c.zEnd||'Unknown';_smap[k]=(_smap[k]||0)+1;});
-        const _sorted=Object.entries(_smap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        const _tot=_all.length||1;
-        const _palette=['#2196f3','#9c27b0','#009688','#ff9800','#e91e63'];
-        _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:6px">Top Sites</div><div style="display:flex;flex-direction:column;gap:3px">';
-        _sorted.forEach(([k,v],i)=>{const w=Math.round((v/_tot)*100);_smh+='<div style="display:flex;align-items:center;gap:5px"><span style="font-size:9px;color:var(--tx3);width:54px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+k+'">'+k+'</span><div style="flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+_palette[i%5]+';border-radius:4px"></div></div><span style="font-size:10px;font-weight:700;color:'+_palette[i%5]+';width:14px;text-align:right">'+v+'</span></div>';});
-        _smh+='</div></div>';
-      } else {
-        // circuitid / no grouping fallback — total count + avg progress
-        const _total=_all.length;
-        if(_total>0){
-          const _pcts=_all.map(c=>{try{const vph=_visPh2(c);const done=vph.filter(v=>v.ph&&v.ph.done).length;return vph.length>0?Math.round((done/vph.length)*100):0;}catch(e){return 0;}});
-          const _avg=Math.round(_pcts.reduce((s,p)=>s+p,0)/_total);
-          _smh='<div style="width:100%"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4);margin-bottom:4px">Summary</div>';
-          _smh+='<div style="font-size:22px;font-weight:800;color:var(--tx1);line-height:1">'+_total+'</div>';
-          _smh+='<div style="font-size:10px;color:var(--tx4);margin-bottom:6px">circuits in flight</div>';
-          _smh+='<div style="height:6px;background:var(--bg4);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+_avg+'%;background:var(--blue3);border-radius:3px;transition:width .3s"></div></div>';
-          _smh+='<div style="font-size:10px;color:var(--tx4);margin-top:3px">'+_avg+'% avg progress</div></div>';
-        }
-      }
-      if(_smh)h+='<div class="mc" style="border-left:3px solid var(--blue3);min-width:160px;flex:1;max-width:280px;align-items:flex-start;padding:10px 12px">'+_smh+'</div>';
-    }catch(e){}
     h+='</div>';
     // Completed names box
     if(completed.length>0){
@@ -579,7 +454,7 @@ function renderIF(){
   let h='<div class="toolbar">';
   h+='<input class="sinp" placeholder="Search circuits..." value="'+(ui.ifSrch||'').replace(/"/g,'&quot;')+'" oninput="setIFS(this.value)" style="max-width:220px">';
   if(ui.ifFilter)h+='<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:20px;background:var(--amb2);color:var(--amb3);border:1px solid var(--amb3)"><i class="ti ti-filter"></i> '+(ui.ifFilter==='risk'?'At risk':'Urgent / Warning')+' <button onclick="clearFilter()" style="border:none;background:transparent;color:var(--amb3);cursor:pointer;font-size:12px;line-height:1;padding:0 0 0 3px">&times;</button></span>';
-  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option><option value="recent" '+(ui.ifGroup==='recent'?'selected':'')+'>Group: Recently Added</option></select>';
+  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option></select>';
   if(selCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected ('+selCount+')</button>';
   const divSelCount=[...ui.selCards].filter(id=>id.startsWith('div-')).length;
   if(divSelCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDelDivs()" title="Delete selected dividers"><i class="ti ti-trash"></i> Delete divider ('+divSelCount+')</button>';
@@ -602,66 +477,6 @@ function renderIF(){
       const _dirLbl=_isDesc?'↓ High → Low':'↑ Low → High';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">% Progress order:</span><button class="btn btn-xs btn-ghost" onclick="togglePctDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
       _ordKeys.forEach(g=>{const list=buckets[g];if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
-      return h;
-    }
-    // Recently Added grouping: sort by createdAt, group by week
-    if(ui.ifGroup==='recent'){
-      const _isNew=ui.ifRecentDir!=='asc';
-      const _dirLbl=_isNew?'↓ Newest → Oldest':'↑ Oldest → Newest';
-      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">Recently added order:</span><button class="btn btn-xs btn-ghost" onclick="toggleRecentDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
-      const _sorted=all.filter(c=>fids.has(c.id)).sort((a,b)=>{
-        const ta=a.createdAt?new Date(a.createdAt).getTime():0;
-        const tb=b.createdAt?new Date(b.createdAt).getTime():0;
-        return _isNew?tb-ta:ta-tb;
-      });
-      const _recentGroups={};
-      _sorted.forEach(c=>{
-        const ts=c.createdAt?new Date(c.createdAt):null;
-        let gk='Unknown date';
-        if(ts){
-          const now=new Date();const diffMs=now-ts;const diffDays=Math.floor(diffMs/86400000);
-          if(diffDays===0)gk='Today';
-          else if(diffDays===1)gk='Yesterday';
-          else if(diffDays<=7)gk='This week';
-          else if(diffDays<=14)gk='Last week';
-          else if(diffDays<=30)gk='This month';
-          else if(diffDays<=60)gk='Last month';
-          else{gk=ts.toLocaleDateString('en-US',{month:'long',year:'numeric'});}
-        }
-        if(!_recentGroups[gk])_recentGroups[gk]=[];
-        _recentGroups[gk].push(c);
-      });
-      Object.entries(_recentGroups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-clock"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
-      return h;
-    }
-    // Recently Added grouping: sort by createdAt, group by recency
-    if(ui.ifGroup==='recent'){
-      const _isNew=ui.ifRecentDir!=='asc';
-      const _dirLbl=_isNew?'↓ Newest → Oldest':'↑ Oldest → Newest';
-      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">Recently added order:</span><button class="btn btn-xs btn-ghost" onclick="toggleRecentDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
-      const _sorted=all.filter(c=>fids.has(c.id)).sort((a,b)=>{
-        const ta=a.createdAt?new Date(a.createdAt).getTime():0;
-        const tb=b.createdAt?new Date(b.createdAt).getTime():0;
-        return _isNew?tb-ta:ta-tb;
-      });
-      const _recentGroups={};
-      _sorted.forEach(c=>{
-        const ts=c.createdAt?new Date(c.createdAt):null;
-        let gk='Unknown date';
-        if(ts){
-          const now=new Date();const diffDays=Math.floor((now-ts)/86400000);
-          if(diffDays===0)gk='Today';
-          else if(diffDays===1)gk='Yesterday';
-          else if(diffDays<=7)gk='This week';
-          else if(diffDays<=14)gk='Last week';
-          else if(diffDays<=30)gk='This month';
-          else if(diffDays<=60)gk='Last month';
-          else gk=ts.toLocaleDateString('en-US',{month:'long',year:'numeric'});
-        }
-        if(!_recentGroups[gk])_recentGroups[gk]=[];
-        _recentGroups[gk].push(c);
-      });
-      Object.entries(_recentGroups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-clock"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
       return h;
     }
     // CAD grouping: sort by date, group by month
@@ -1658,8 +1473,7 @@ window.dismissRisk=id=>{if(!ui.dismissedRisk)ui.dismissedRisk=new Set();ui.dismi
 window.setIFSToCircuit=id=>{ui.sel=id;const c=circuits.find(x=>x.id===id);if(c&&ui.phTab[id]===undefined)ui.phTab[id]=c.currentPhase;renderApp();const el=document.getElementById('cc-'+id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});};
 window.filterUrgent=()=>{ui.ifFilter=ui.ifFilter==='urgent'?'':'urgent';ui.ifSrch='';renderApp();};
 window.setIFSort=v=>{ui.ifSort=v;renderApp();};
-window.setIFGroup=v=>{ui.ifGroup=v;if(v==='pct')ui.ifPctDir='desc';if(v==='recent')ui.ifRecentDir='desc';renderApp();};
-window.toggleRecentDir=()=>{ui.ifRecentDir=ui.ifRecentDir==='desc'?'asc':'desc';renderApp();};
+window.setIFGroup=v=>{ui.ifGroup=v;if(v==='pct')ui.ifPctDir='desc';renderApp();};
 window.togglePctDir=()=>{ui.ifPctDir=ui.ifPctDir==='desc'?'asc':'desc';renderApp();};
 window.toggleTheme=()=>{prefs.theme=prefs.theme==='dark'?'light':'dark';sv(PK,prefs);render();};
 window.setThemePref=t=>{
