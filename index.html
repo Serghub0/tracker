@@ -308,13 +308,19 @@ deleted=deleted.filter(c=>new Date(c.deletedAt||0).getTime()>Date.now()-30*864e5
 let ui={tab:'inflight',histCat:'',histSrch:'',sel:null,openCards:new Set(),multiOpen:false,settingsDirty:false,phTab:{},iTab:{},confId:null,cc:{},archSrch:'',archSel:null,archPh:{},archIT:{},delSrch:'',compSrch:'',compSel:null,compPh:{},compIT:{},ifSrch:'',ifFilter:'',dismissedRisk:new Set(),ifSort:tmpl.displaySettings?.defaultSort||'cad',ifGroup:tmpl.displaySettings?.defaultGroup||'',ifPctDir:'desc',modal:false,mType:'',expSel:{},expTgt:'',msg:'',pendTmpl:false,stab:'template',selCards:new Set()};
 let dgSrc=null,ciDg=null;
 
-// ── Wake Lock (always-on) ─────────────────────────────────────────────────
+// ── Wake Lock (12-hour limit) ─────────────────────────────────────────────
 let _wl=null;
+const _wlDuration=6*60*60*1000; // 6 hours in ms
+const _wlStart=Date.now();
+let _wlTimer=null;
 async function _wlAcquire(){
   if(!('wakeLock' in navigator))return;
+  if(Date.now()-_wlStart>=_wlDuration)return; // past 12hrs, don't re-acquire
   try{_wl=await navigator.wakeLock.request('screen');_wl.addEventListener('release',()=>{_wl=null;});}catch(e){}
 }
+function _wlStop(){if(_wl){_wl.release();_wl=null;}}
 _wlAcquire();
+_wlTimer=setTimeout(_wlStop,_wlDuration); // release after 12 hours
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_wlAcquire();});
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -458,7 +464,7 @@ function renderIF(){
   const fids=new Set(all.filter(c=>{
     if(_filter==='risk') return getSt(c)==='risk';
     if(_filter==='urgent') return c.urgent||c.priority>0;
-    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q));
+    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q));
   }).map(c=>c.id));
   const selCount=ui.selCards.size;
   let h='<div class="toolbar">';
@@ -750,7 +756,7 @@ function renderContacts(c,src){
 
 function renderQueue(){
   const q=(ui.qSrch||'').toLowerCase();
-  let list=queue.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
+  let list=queue.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q)));
   let h='<div class="toolbar"><input class="sinp" placeholder="Search queue..." value="'+(ui.qSrch||'').replace(/"/g,'&quot;')+'" oninput="setQS(this.value)" style="max-width:220px"></div>';
   if(!list.length)return h+'<div class="empty"><i class="ti ti-clock-pause empty-icon"></i>'+(queue.length===0?'No circuits in queue. Click <strong>New circuit</strong> to add one.':'No results.')+'</div>';
   list.forEach(c=>{
@@ -776,7 +782,7 @@ function renderQueue(){
 }
 function renderCompleted(){
   const q=(ui.compSrch||'').toLowerCase();
-  let list=completed.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
+  let list=completed.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q)));
   let h='<div class="toolbar"><input class="sinp" placeholder="Search completed..." value="'+(ui.compSrch||'').replace(/"/g,'&quot;')+'" oninput="setCS(this.value)" style="max-width:220px"></div>';
   if(!list.length)return h+'<div class="empty"><i class="ti ti-circle-check empty-icon"></i>'+(completed.length===0?'No completed circuits yet. Circuits appear here after Mark live &amp; completed.':'No results.')+'</div>';
   list.forEach(c=>{
@@ -813,7 +819,7 @@ function renderCompleted(){
 }
 function renderArch(){
   const q=(ui.archSrch||'').toLowerCase();
-  let list=archive.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
+  let list=archive.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q)));
   let h='<div class="toolbar"><input class="sinp" placeholder="Search archive..." value="'+(ui.archSrch||'').replace(/"/g,'&quot;')+'" oninput="setAS(this.value)"></div>';
   if(!list.length)return h+'<div class="empty"><i class="ti ti-archive empty-icon"></i>'+(archive.length===0?'No archived circuits.':'No results.')+'</div>';
   list.forEach(c=>{
