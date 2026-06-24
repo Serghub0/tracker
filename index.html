@@ -465,7 +465,7 @@ function renderIF(){
   const fids=new Set(all.filter(c=>{
     if(_filter==='risk') return getSt(c)==='risk';
     if(_filter==='urgent') return c.urgent||c.priority>0;
-    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q));
+    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.carrierPmPhone,c.carrierPmEmail,c.hwPmName,c.hwPmPhone,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q));
   }).map(c=>c.id));
   const selCount=ui.selCards.size;
   let h='<div class="toolbar">';
