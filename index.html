@@ -310,7 +310,7 @@ let dgSrc=null,ciDg=null;
 
 // ── Wake Lock (12-hour limit) ─────────────────────────────────────────────
 let _wl=null;
-const _wlDuration=6*60*60*1000; // 6 hours in ms
+const _wlDuration=12*60*60*1000; // 12 hours in ms
 const _wlStart=Date.now();
 let _wlTimer=null;
 async function _wlAcquire(){
@@ -460,17 +460,18 @@ function renderIF(){
   else if(ui.ifSort==='service')all.sort((a,b)=>(a.serviceType||'').localeCompare(b.serviceType||''));
   else if(ui.ifSort==='site')all.sort((a,b)=>(a.zEnd||'').localeCompare(b.zEnd||''));
   else if(ui.ifSort==='urgent')all.sort((a,b)=>(b.urgent?1:0)-(a.urgent?1:0));
+  else if(ui.ifSort==='date')all.sort((a,b)=>{const ta=a.createdAt?new Date(a.createdAt).getTime():0;const tb=b.createdAt?new Date(b.createdAt).getTime():0;return tb-ta;});
   const _filter=ui.ifFilter||'';
   const fids=new Set(all.filter(c=>{
     if(_filter==='risk') return getSt(c)==='risk';
     if(_filter==='urgent') return c.urgent||c.priority>0;
-    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q));
+    return !q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q));
   }).map(c=>c.id));
   const selCount=ui.selCards.size;
   let h='<div class="toolbar">';
   h+='<input class="sinp" placeholder="Search circuits..." value="'+(ui.ifSrch||'').replace(/"/g,'&quot;')+'" oninput="setIFS(this.value)" style="max-width:220px">';
   if(ui.ifFilter)h+='<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:20px;background:var(--amb2);color:var(--amb3);border:1px solid var(--amb3)"><i class="ti ti-filter"></i> '+(ui.ifFilter==='risk'?'At risk':'Urgent / Warning')+' <button onclick="clearFilter()" style="border:none;background:transparent;color:var(--amb3);cursor:pointer;font-size:12px;line-height:1;padding:0 0 0 3px">&times;</button></span>';
-  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option></select>';
+  h+='<select class="ssel" onchange="setIFGroup(this.value)"><option value="" '+(!ui.ifGroup?'selected':'')+'>No grouping</option><option value="date" '+(ui.ifGroup==="date"?'selected':'')+'>Group: Date Added</option><option value="engineer" '+(ui.ifGroup==='engineer'?'selected':'')+'>Group: Engineer</option><option value="service" '+(ui.ifGroup==='service'?'selected':'')+'>Group: Service</option><option value="site" '+(ui.ifGroup==='site'?'selected':'')+'>Group: Site</option><option value="urgent" '+(ui.ifGroup==='urgent'?'selected':'')+'>Group: Urgent</option><option value="pct" '+(ui.ifGroup==='pct'?'selected':'')+'>Group: % Progress</option><option value="carrier" '+(ui.ifGroup==='carrier'?'selected':'')+'>Group: Carrier</option><option value="protection" '+(ui.ifGroup==='protection'?'selected':'')+'>Group: Protection</option><option value="circuitid" '+(ui.ifGroup==='circuitid'?'selected':'')+'>Group: Circuit ID</option><option value="cad" '+(ui.ifGroup==='cad'?'selected':'')+'>Group: CAD</option><option value="cad_carrier" '+(ui.ifGroup==='cad_carrier'?'selected':'')+'>Group: CAD / Carrier</option></select>';
   if(selCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDel()"><i class="ti ti-trash"></i> Delete selected ('+selCount+')</button>';
   const divSelCount=[...ui.selCards].filter(id=>id.startsWith('div-')).length;
   if(divSelCount>0)h+='<button class="btn btn-sm btn-red" onclick="bulkDelDivs()" title="Delete selected dividers"><i class="ti ti-trash"></i> Delete divider ('+divSelCount+')</button>';
@@ -493,6 +494,33 @@ function renderIF(){
       const _dirLbl=_isDesc?'↓ High → Low':'↑ Low → High';
       h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;color:var(--tx4)">% Progress order:</span><button class="btn btn-xs btn-ghost" onclick="togglePctDir()" style="font-size:11px">'+_dirLbl+'</button></div>';
       _ordKeys.forEach(g=>{const list=buckets[g];if(!list.length)return;h+='<div class="grp-hdr"><i class="ti ti-chart-bar"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
+      return h;
+    }
+    // Date Added grouping: group by recency
+    if(ui.ifGroup==='date'){
+      const _sorted=all.filter(c=>fids.has(c.id)).sort((a,b)=>{
+        const ta=a.createdAt?new Date(a.createdAt).getTime():0;
+        const tb=b.createdAt?new Date(b.createdAt).getTime():0;
+        return tb-ta;
+      });
+      const _groups={};
+      _sorted.forEach(c=>{
+        const ts=c.createdAt?new Date(c.createdAt):null;
+        let gk='Unknown date';
+        if(ts){
+          const diffDays=Math.floor((new Date()-ts)/86400000);
+          if(diffDays===0)gk='Today';
+          else if(diffDays===1)gk='Yesterday';
+          else if(diffDays<=7)gk='This week';
+          else if(diffDays<=14)gk='Last week';
+          else if(diffDays<=30)gk='This month';
+          else if(diffDays<=60)gk='Last month';
+          else gk=ts.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        }
+        if(!_groups[gk])_groups[gk]=[];
+        _groups[gk].push(c);
+      });
+      Object.entries(_groups).forEach(([g,list])=>{h+='<div class="grp-hdr"><i class="ti ti-clock"></i>'+g+' <span class="nbadge">'+list.length+'</span></div>';list.forEach(c=>{h+=renderCard(c,false);});});
       return h;
     }
     // CAD grouping: sort by date, group by month
@@ -756,7 +784,7 @@ function renderContacts(c,src){
 
 function renderQueue(){
   const q=(ui.qSrch||'').toLowerCase();
-  let list=queue.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q)));
+  let list=queue.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
   let h='<div class="toolbar"><input class="sinp" placeholder="Search queue..." value="'+(ui.qSrch||'').replace(/"/g,'&quot;')+'" oninput="setQS(this.value)" style="max-width:220px"></div>';
   if(!list.length)return h+'<div class="empty"><i class="ti ti-clock-pause empty-icon"></i>'+(queue.length===0?'No circuits in queue. Click <strong>New circuit</strong> to add one.':'No results.')+'</div>';
   list.forEach(c=>{
@@ -782,7 +810,7 @@ function renderQueue(){
 }
 function renderCompleted(){
   const q=(ui.compSrch||'').toLowerCase();
-  let list=completed.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q)));
+  let list=completed.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
   let h='<div class="toolbar"><input class="sinp" placeholder="Search completed..." value="'+(ui.compSrch||'').replace(/"/g,'&quot;')+'" oninput="setCS(this.value)" style="max-width:220px"></div>';
   if(!list.length)return h+'<div class="empty"><i class="ti ti-circle-check empty-icon"></i>'+(completed.length===0?'No completed circuits yet. Circuits appear here after Mark live &amp; completed.':'No results.')+'</div>';
   list.forEach(c=>{
@@ -819,7 +847,7 @@ function renderCompleted(){
 }
 function renderArch(){
   const q=(ui.archSrch||'').toLowerCase();
-  let list=archive.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer,c.carrierPmName,c.hwPmName,c.hwEngName].some(v=>(v||'').toLowerCase().includes(q)));
+  let list=archive.filter(c=>!q||[c.name,c.circuitId,c.carrier,c.serviceType,c.aEnd,c.zEnd,c.transportEngineer].some(v=>(v||'').toLowerCase().includes(q)));
   let h='<div class="toolbar"><input class="sinp" placeholder="Search archive..." value="'+(ui.archSrch||'').replace(/"/g,'&quot;')+'" oninput="setAS(this.value)"></div>';
   if(!list.length)return h+'<div class="empty"><i class="ti ti-archive empty-icon"></i>'+(archive.length===0?'No archived circuits.':'No results.')+'</div>';
   list.forEach(c=>{
@@ -1297,7 +1325,7 @@ function renderSettings(){
     body+='<div class="srow"><div><div class="slbl">Company name</div><div class="ssub">Shown in header eyebrow and Word doc</div></div><input class="sinp2" value="'+(tmpl.wordSettings?.companyName||'Hotwire Communications').replace(/"/g,'&quot;')+'" onchange="updWS(\'companyName\',this.value)" style="width:220px"></div>';
         const _curPx=prefs.fontSize||13;
     body+='<div class="srow"><div><div class="slbl">Base font size</div><div class="ssub">11px–15px supported. Changes preview immediately, Save to make permanent.</div></div><div style="display:flex;align-items:center;gap:7px"><select class="ssel2" onchange="updFontSize(this.value)"><option value="11" '+(_curPx===11?'selected':'')+'>Small (11px)</option><option value="12" '+(_curPx===12?'selected':'')+'>Medium (12px)</option><option value="13" '+(_curPx===13?'selected':'')+'>Normal (13px)</option><option value="14" '+(_curPx===14?'selected':'')+'>Large (14px)</option><option value="15" '+(_curPx===15?'selected':'')+'>Extra large (15px)</option></select><button class="btn btn-xs btn-ghost" onclick="updFontSize(13)"><i class="ti ti-refresh"></i> Default</button></div></div>';
-    body+='<div class="srow"><div class="slbl">Default sort</div><select class="ssel2" onchange="updDS(\'defaultSort\',this.value)"><option value="cad" '+(ds.defaultSort==='cad'?'selected':'')+'>CAD date</option><option value="engineer" '+(ds.defaultSort==='engineer'?'selected':'')+'>Engineer</option><option value="service" '+(ds.defaultSort==='service'?'selected':'')+'>Service type</option><option value="site" '+(ds.defaultSort==='site'?'selected':'')+'>Site</option><option value="urgent" '+(ds.defaultSort==='urgent'?'selected':'')+'>Urgent first</option></select></div>';
+    body+='<div class="srow"><div class="slbl">Default sort</div><select class="ssel2" onchange="updDS(\'defaultSort\',this.value)"><option value="cad" '+(ds.defaultSort==='cad'?'selected':'')+'>CAD date</option><option value="date" '+(ds.defaultSort==='date'?'selected':'')+'>Date Added</option><option value="engineer" '+(ds.defaultSort==='engineer'?'selected':'')+'>Engineer</option><option value="service" '+(ds.defaultSort==='service'?'selected':'')+'>Service type</option><option value="site" '+(ds.defaultSort==='site'?'selected':'')+'>Site</option><option value="urgent" '+(ds.defaultSort==='urgent'?'selected':'')+'>Urgent first</option></select></div>';
     body+='<div class="srow"><div class="slbl">Default group</div><select class="ssel2" onchange="updDS(\'defaultGroup\',this.value)"><option value="" '+(!ds.defaultGroup?'selected':'')+'>None</option><option value="engineer" '+(ds.defaultGroup==='engineer'?'selected':'')+'>Engineer</option><option value="service" '+(ds.defaultGroup==='service'?'selected':'')+'>Service type</option><option value="site" '+(ds.defaultGroup==='site'?'selected':'')+'>Site</option></select></div>';
     body+='<div class="srow"><div><div class="slbl">Capacity warning threshold</div><div class="ssub">Show warning when circuits reach this number</div></div><input class="sinp2" type="number" value="'+(ds.capWarning||40)+'" style="width:80px" onchange="updDS(\'capWarning\',parseInt(this.value)||40)"></div>';
     body+='<div style="margin-top:10px"><button class="btn btn-green" onclick="saveTmpl()"><i class="ti ti-device-floppy"></i> Save</button></div></div>';
